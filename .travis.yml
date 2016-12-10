@@ -23,6 +23,8 @@ matrix:
       dist: trusty
       env: TEST_RUNNER=make VERBOSE=2
       sudo: false
+      after_success:
+        du
       script: make test
 
     - os: linux
