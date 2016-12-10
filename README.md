@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/jomof/autogen.svg?branch=master)](https://travis-ci.org/jomof/autogen)
+[![Build Status](https://travis-ci.org/jomof/build-zone.svg?branch=master)](https://travis-ci.org/jomof/build-zone)
 
 # autogen
 
