@@ -24,7 +24,7 @@ matrix:
       env: TEST_RUNNER=make VERBOSE=2
       sudo: false
       after_success:
-        du
+        du -a
       script: make test
 
     - os: linux
