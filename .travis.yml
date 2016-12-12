@@ -21,14 +21,6 @@ matrix:
   include:
     - os: linux
       dist: trusty
-      env: TEST_RUNNER=make VERBOSE=2
-      sudo: false
-      after_success:
-        du -a
-      script: make test
-
-    - os: linux
-      dist: trusty
       env: TEST_RUNNER=bazel
 
       # `sudo` is required because:
@@ -81,11 +73,6 @@ matrix:
 
       script:
         - bazel test //...
-
-    - os: osx
-      env: TEST_RUNNER=make VERBOSE=2
-      sudo: false
-      script: make test
 
     - os: osx
       env: TEST_RUNNER=bazel
