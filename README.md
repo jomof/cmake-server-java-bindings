@@ -4,6 +4,6 @@
 
 Calling CMake as a server process:
 
-cmake -E server --debug
+    cmake -E server --debug
 
 ....project set up in progress....
