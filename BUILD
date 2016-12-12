@@ -16,7 +16,17 @@
 
 package(default_visibility = ["//visibility:public"])
 
-sh_binary(
-    name = "autogen_tool",
-    srcs = ["autogen"],
+java_library(
+    name = "com.jomofisher.cmakeserver",
+    srcs = glob(["src/main/**/*.java"]),
+)
+
+java_test(
+    name = "AllTests",
+    size = "small",
+    srcs = glob(["src/test/**/*.java"]),
+    test_class = "com.jomofisher.cmakeserver.TestGreeting",
+    deps = [
+        ":com.jomofisher.cmakeserver"
+    ],
 )
