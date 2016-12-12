@@ -4,3 +4,6 @@ bazel-*
 # Ignore temporary editor backup files.
 *~         # Emacs
 *.swp      # Vim
+
+.idea/*
+*.~
