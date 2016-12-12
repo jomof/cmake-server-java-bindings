@@ -18,7 +18,10 @@ package(default_visibility = ["//visibility:public"])
 
 java_library(
     name = "com.jomofisher.cmakeserver",
-    srcs = glob(["com/jomofisher/cmakeserver/Greeting.java"]),
+    srcs = [
+        "com/jomofisher/cmakeserver/CMakeServer.java",
+        "com/jomofisher/cmakeserver/Greeting.java",
+    ],
 )
 
 java_test(
