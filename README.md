@@ -3,6 +3,7 @@
 # CMake Server Java Bindings
 
 Calling CMake as a server process:
+
 cmake -E server --debug
 
 ....project set up in progress....
