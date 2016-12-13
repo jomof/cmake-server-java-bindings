@@ -14,11 +14,23 @@
 #
 ################################################################################
 
+java_import(
+    name = "gson",
+    jars = [
+        "prebuilts/gson-2.2.4/gson-2.2.4.jar",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 java_library(
     name = "com.jomofisher.cmakeserver",
     srcs = [
         "com/jomofisher/cmakeserver/CMakeServer.java",
+        "com/jomofisher/cmakeserver/CMakeServerConnection.java",
+        "com/jomofisher/cmakeserver/HelloMessage.java",
+        "com/jomofisher/cmakeserver/ProtocolVersion.java",
     ],
+    deps = ["gson"],
 )
 
 java_test(
@@ -26,5 +38,7 @@ java_test(
     size = "small",
     srcs = glob(["com/jomofisher/cmakeserver/TestCMakeServer.java"]),
     test_class = "com.jomofisher.cmakeserver.TestCMakeServer",
-    deps = [":com.jomofisher.cmakeserver"],
+    deps = [
+        ":com.jomofisher.cmakeserver",
+    ],
 )
