@@ -27,7 +27,8 @@ install:
     else
       CMAKE_URL="https://cmake.org/files/v3.7/cmake-3.7.1-Darwin-x86_64.tar.gz"
       mkdir cmake 
-      travis_retry curl "${CMAKE_URL}" | tar --strip-components=1 -xz -C cmake
+      travis_retry curl "${CMAKE_URL}" -o "cmake.tar.gz"
+      cat cmake.tar.gz | tar --strip-components=1 -xz -C cmake
     fi
   - |
     cmake/bin/cmake --version
