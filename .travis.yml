@@ -33,9 +33,9 @@ install:
   - |
     ls
   - |
-    ls cmake
+    ls cmake/CMake.app
   - |
-    ls cmake/bin
+    ls cmake/CMake.app/bin
   - |
     cmake/bin/cmake --version
     
