@@ -14,22 +14,17 @@
 #
 ################################################################################
 
-package(default_visibility = ["//visibility:public"])
-
 java_library(
     name = "com.jomofisher.cmakeserver",
     srcs = [
         "com/jomofisher/cmakeserver/CMakeServer.java",
-        "com/jomofisher/cmakeserver/Greeting.java",
     ],
 )
 
 java_test(
-    name = "AllTests",
+    name = "TestCMakeServer",
     size = "small",
-    srcs = glob(["com/jomofisher/cmakeserver/TestGreeting.java"]),
-    test_class = "com.jomofisher.cmakeserver.TestGreeting",
-    deps = [
-        ":com.jomofisher.cmakeserver",
-    ],
+    srcs = glob(["com/jomofisher/cmakeserver/TestCMakeServer.java"]),
+    test_class = "com.jomofisher.cmakeserver.TestCMakeServer",
+    deps = [":com.jomofisher.cmakeserver"],
 )

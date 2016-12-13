@@ -6,4 +6,4 @@ bazel-*
 *.swp      # Vim
 
 .idea/*
-*.~
+cmake/*
