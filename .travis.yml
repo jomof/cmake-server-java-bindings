@@ -31,11 +31,11 @@ install:
       cat cmake.tar.gz | tar --strip-components=1 -xz -C cmake
     fi
   - |
-    ll
+    ls
   - |
-    ll cmake
+    ls cmake
   - |
-    ll cmake/bin
+    ls cmake/bin
   - |
     cmake/bin/cmake --version
     
