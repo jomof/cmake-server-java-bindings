@@ -31,6 +31,12 @@ install:
       cat cmake.tar.gz | tar --strip-components=1 -xz -C cmake
     fi
   - |
+    ll
+  - |
+    ll cmake
+  - |
+    ll cmake/bin
+  - |
     cmake/bin/cmake --version
     
 matrix:
