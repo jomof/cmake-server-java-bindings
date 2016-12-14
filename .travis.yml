@@ -87,7 +87,7 @@ matrix:
             - bazel
 
       script:
-        - bazel test --test_env BAZEL_CMAKE_INSTALL_FOLDER=$BAZEL_CMAKE_INSTALL_FOLDER //...
+        - bazel test --test_output=errors --test_env BAZEL_CMAKE_INSTALL_FOLDER=$BAZEL_CMAKE_INSTALL_FOLDER //...
 
     - os: osx
       env: TEST_RUNNER=bazel
