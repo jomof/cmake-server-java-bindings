@@ -30,7 +30,7 @@ install:
       mkdir cmake 
       travis_retry curl "${CMAKE_URL}" -o "cmake.tar.gz"
       cat cmake.tar.gz | tar --strip-components=1 -xz -C cmake
-      BAZEL_CMAKE_INSTALL_FOLDER=$PWD/cmake/CMake.app/Contents
+      BAZEL_CMAKE_INSTALL_FOLDER=$PWD/cmake/CMake.app/Content
     fi
     echo BAZEL_CMAKE_INSTALL_FOLDER=${BAZEL_CMAKE_INSTALL_FOLDER}
     
