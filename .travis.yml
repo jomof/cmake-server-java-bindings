@@ -32,6 +32,7 @@ install:
       cat cmake.tar.gz | tar --strip-components=1 -xz -C cmake
       BAZEL_CMAKE_INSTALL_FOLDER=$PWD/cmake/CMake.app/Contents
     fi
+    @echo BAZEL_CMAKE_INSTALL_FOLDER=${BAZEL_CMAKE_INSTALL_FOLDER}
     
 matrix:
   include:
