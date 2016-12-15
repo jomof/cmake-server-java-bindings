@@ -17,28 +17,42 @@ package com.jomofisher.cmakeserver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class CMakeServerConnection {
   private final File cmakeInstallPath;
+  private final boolean allowExtraMessageFields;
   Process process;
   BufferedReader input;
   BufferedWriter output;
-  String connectionMessage;
 
   CMakeServerConnection(File cmakeInstallPath) {
     this.cmakeInstallPath = cmakeInstallPath;
+    this.allowExtraMessageFields = true;
+  }
+
+  CMakeServerConnection(File cmakeInstallPath, boolean allowExtraMessageFields) {
+    this.cmakeInstallPath = cmakeInstallPath;
+    this.allowExtraMessageFields = allowExtraMessageFields;
   }
 
   private String readLine() throws IOException {
     System.err.printf("Reading: ");
     String line = input.readLine();
-    System.err.printf(line);
+    System.err.printf(line + "\n");
     return line;
   }
 
@@ -76,13 +90,48 @@ public class CMakeServerConnection {
     output.flush();
   }
 
-  public void connect() throws IOException {
-    if (!cmakeInstallPath.isDirectory()) {
-//      throw new RuntimeException(
-//          String.format("Expected CMake install path %s to be a folder",
-//              cmakeInstallPath.getAbsolutePath()));
+  private static Set<String> getFieldNames(Class clazz) {
+    System.err.printf("Adding fields for %s\n", clazz);
+    Set<String> fields = new HashSet<>();
+    for (Field field : clazz.getFields()) {
+      System.err.printf("Adding %s\n", field.getName());
+      fields.add(field.getName());
     }
+    Class parent = clazz.getSuperclass();
+    if (parent != null) {
+      fields.addAll(getFieldNames(parent));
+    }
+    return fields;
+  }
 
+  private static <T extends Message> void checkForExtraFields(String message, Class<T> clazz) {
+    JsonObject root = new JsonParser().parse(message).getAsJsonObject();
+    Set<String> fieldNames = getFieldNames(clazz);
+    for (Entry<String, JsonElement> element : root.entrySet()) {
+      if (!fieldNames.contains(element.getKey())) {
+        throw new RuntimeException(String.format("Did not find field %s in class %s",
+            element.getKey(), clazz.getSimpleName()));
+      }
+    }
+  }
+
+  private <T extends Message> T decodeMessage(String message, Class<T> clazz) {
+    if (!allowExtraMessageFields) {
+      checkForExtraFields(message, clazz);
+    }
+    Gson gson = new GsonBuilder()
+        .create();
+    Message messageType = gson.fromJson(message, Message.class);
+    switch (messageType.type) {
+      case "hello":
+      case "reply":
+        return gson.fromJson(message, clazz);
+      default:
+        throw new RuntimeException(message);
+    }
+  }
+
+  public HelloMessage connect() throws IOException {
     if (System.getProperty("os.name").contains("Windows")) {
       process = new ProcessBuilder(String.format("%s\\bin\\cmake", cmakeInstallPath),
           "-E", "server", "--experimental", "--debug").start();
@@ -94,26 +143,16 @@ public class CMakeServerConnection {
     input = new BufferedReader(new InputStreamReader(process.getInputStream()));
     output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-    // Read the 'hello' message from CMake server.
-    readExpected("");
-    connectionMessage = readMessage();
-    Gson gson = new GsonBuilder().create();
-    HelloMessage hello = gson.fromJson(connectionMessage, HelloMessage.class);
-    if (!hello.type.equals("hello")) {
-      throw new RuntimeException("Expected hello message from CMake server");
-    }
-    System.out.printf("\n<%s>\n", connectionMessage);
+    return decodeMessage(readMessage(), HelloMessage.class);
   }
 
-
-  public int handshake(String message) throws IOException {
+  public HandshakeReplyMessage handshake(String message) throws IOException {
     writeMessage(message);
-    String result = readMessage();
-    return 0;
+    return decodeMessage(readMessage(), HandshakeReplyMessage.class);
   }
 
-  public int handshake(String cookie, File sourceDirectory, File buildDirectory, String generator)
-      throws IOException {
+  public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
+      File buildDirectory, String generator) throws IOException {
     if (!sourceDirectory.isDirectory()) {
       throw new RuntimeException(String.format(
           "Expected sourceDirectory %s to exist", sourceDirectory));
@@ -133,7 +172,6 @@ public class CMakeServerConnection {
         sourceDirectory,
         buildDirectory,
         generator));
-
   }
 }
 

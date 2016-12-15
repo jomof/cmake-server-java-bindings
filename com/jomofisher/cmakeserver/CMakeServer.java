@@ -20,8 +20,10 @@ import java.io.IOException;
 
 public class CMakeServer {
 
-  public static CMakeServerConnection connect(File cmakeInstallPath) throws IOException {
-    CMakeServerConnection connection = new CMakeServerConnection(cmakeInstallPath);
+  public static CMakeServerConnection connect(File cmakeInstallPath,
+      boolean allowExtraMessageFields) throws IOException {
+    CMakeServerConnection connection = new CMakeServerConnection(cmakeInstallPath,
+        allowExtraMessageFields);
     connection.connect();
     return connection;
   }

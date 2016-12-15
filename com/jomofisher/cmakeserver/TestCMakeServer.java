@@ -47,13 +47,16 @@ public class TestCMakeServer {
       }
     }
 
-  private File getCMakeInstallFolder() {
+  private File getWorkspaceFolder() {
     if (System.getenv("BAZEL_CMAKE_WORKSPACE_FOLDER") == null) {
       throw new RuntimeException("You must pass BAZEL_CMAKE_WORKSPACE_FOLDER at bazel test command-line");
     }
 
-    File workspaceFolder = new File(System.getenv("BAZEL_CMAKE_WORKSPACE_FOLDER"));
+    return new File(System.getenv("BAZEL_CMAKE_WORKSPACE_FOLDER"));
+  }
 
+  private File getCMakeInstallFolder() {
+    File workspaceFolder = getWorkspaceFolder();
     switch (detectedOS) {
       case Linux: return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Linux-x86_64");
       case MacOS: return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Darwin-x86_64/CMake.app/Contents");
@@ -62,16 +65,23 @@ public class TestCMakeServer {
     }
   }
 
+  private File getSampleProjectsFolder() {
+    File workspaceFolder = getWorkspaceFolder();
+    return new File(workspaceFolder, "test-data/cmake-projects/");
+  }
+
   @Test
   public void testConnect() throws Exception {
-    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder());
+    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder(),
+        false /* allowExtraMessageFields */);
   }
 
   @Test
   public void testHandshake() throws Exception {
-    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder());
-    connection.handshake("my-cookie",
-        new File("/usr/local/google/home/jomof/projects/cmake-server-java-bindings/test-data/cmake-projects/hello-world"),
+    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder(),
+        false /* allowExtraMessageFields */);
+    HandshakeReplyMessage reply  = connection.handshake("my-cookie",
+        new File(getSampleProjectsFolder(), "hello-world"),
         new File("."),
         "Ninja");
   }
