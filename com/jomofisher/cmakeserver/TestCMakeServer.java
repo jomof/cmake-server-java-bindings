@@ -85,4 +85,15 @@ public class TestCMakeServer {
         new File("."),
         "Ninja");
   }
+
+  @Test
+  public void testGlobalSettings() throws Exception {
+    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder(),
+        false /* allowExtraMessageFields */);
+    connection.handshake("my-cookie",
+        new File(getSampleProjectsFolder(), "hello-world"),
+        new File("."),
+        "Ninja");
+    GlobalSettingsReplyMessage reply  = connection.globalSettings();
+  }
 }

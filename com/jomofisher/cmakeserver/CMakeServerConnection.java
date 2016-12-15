@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.jomofisher.cmakeserver;
+import static com.jomofisher.cmakeserver.JsonUtils.checkForExtraFields;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -28,9 +29,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Field;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 public class CMakeServerConnection {
   private final File cmakeInstallPath;
@@ -40,8 +41,7 @@ public class CMakeServerConnection {
   BufferedWriter output;
 
   CMakeServerConnection(File cmakeInstallPath) {
-    this.cmakeInstallPath = cmakeInstallPath;
-    this.allowExtraMessageFields = true;
+    this(cmakeInstallPath, true);
   }
 
   CMakeServerConnection(File cmakeInstallPath, boolean allowExtraMessageFields) {
@@ -90,41 +90,19 @@ public class CMakeServerConnection {
     output.flush();
   }
 
-  private static Set<String> getFieldNames(Class clazz) {
-    System.err.printf("Adding fields for %s\n", clazz);
-    Set<String> fields = new HashSet<>();
-    for (Field field : clazz.getFields()) {
-      System.err.printf("Adding %s\n", field.getName());
-      fields.add(field.getName());
-    }
-    Class parent = clazz.getSuperclass();
-    if (parent != null) {
-      fields.addAll(getFieldNames(parent));
-    }
-    return fields;
-  }
 
-  private static <T extends Message> void checkForExtraFields(String message, Class<T> clazz) {
-    JsonObject root = new JsonParser().parse(message).getAsJsonObject();
-    Set<String> fieldNames = getFieldNames(clazz);
-    for (Entry<String, JsonElement> element : root.entrySet()) {
-      if (!fieldNames.contains(element.getKey())) {
-        throw new RuntimeException(String.format("Did not find field %s in class %s",
-            element.getKey(), clazz.getSimpleName()));
-      }
-    }
-  }
+
 
   private <T extends Message> T decodeMessage(String message, Class<T> clazz) {
-    if (!allowExtraMessageFields) {
-      checkForExtraFields(message, clazz);
-    }
     Gson gson = new GsonBuilder()
         .create();
     Message messageType = gson.fromJson(message, Message.class);
     switch (messageType.type) {
       case "hello":
       case "reply":
+        if (!allowExtraMessageFields) {
+          checkForExtraFields(message, clazz);
+        }
         return gson.fromJson(message, clazz);
       default:
         throw new RuntimeException(message);
@@ -172,6 +150,11 @@ public class CMakeServerConnection {
         sourceDirectory,
         buildDirectory,
         generator));
+  }
+
+  public GlobalSettingsReplyMessage globalSettings() throws IOException {
+    writeMessage("{\"type\":\"globalSettings\"}");
+    return decodeMessage(readMessage(), GlobalSettingsReplyMessage.class);
   }
 }
 

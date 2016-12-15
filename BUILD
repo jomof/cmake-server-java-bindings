@@ -27,10 +27,15 @@ java_library(
     srcs = [
         "com/jomofisher/cmakeserver/CMakeServer.java",
         "com/jomofisher/cmakeserver/CMakeServerConnection.java",
+        "com/jomofisher/cmakeserver/Capabilities.java",
+        "com/jomofisher/cmakeserver/Generator.java",
+        "com/jomofisher/cmakeserver/GlobalSettingsReplyMessage.java",
         "com/jomofisher/cmakeserver/HandshakeReplyMessage.java",
         "com/jomofisher/cmakeserver/HelloMessage.java",
+        "com/jomofisher/cmakeserver/JsonUtils.java",
         "com/jomofisher/cmakeserver/Message.java",
         "com/jomofisher/cmakeserver/ProtocolVersion.java",
+        "com/jomofisher/cmakeserver/Version.java",
     ],
     deps = ["gson"],
 )
