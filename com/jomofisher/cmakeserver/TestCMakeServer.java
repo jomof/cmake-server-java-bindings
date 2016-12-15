@@ -67,12 +67,12 @@ public class TestCMakeServer {
     CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder());
   }
 
-//  @Test
-//  public void testHandshake() throws Exception {
-//    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder());
-//    connection.handshake("my-cookie",
-//        new File("/usr/local/google/home/jomof/projects/cmake-server-java-bindings/test-data/cmake-projects/hello-world"),
-//        new File("."),
-//        "Ninja");
-//  }
+  @Test
+  public void testHandshake() throws Exception {
+    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder());
+    connection.handshake("my-cookie",
+        new File("/usr/local/google/home/jomof/projects/cmake-server-java-bindings/test-data/cmake-projects/hello-world"),
+        new File("."),
+        "Ninja");
+  }
 }

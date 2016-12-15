@@ -18,6 +18,7 @@ package com.jomofisher.cmakeserver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -27,26 +28,52 @@ public class CMakeServerConnection {
   private final File cmakeInstallPath;
   Process process;
   BufferedReader input;
-  OutputStreamWriter output;
+  BufferedWriter output;
   String connectionMessage;
 
   CMakeServerConnection(File cmakeInstallPath) {
     this.cmakeInstallPath = cmakeInstallPath;
   }
 
+  private String readLine() throws IOException {
+    System.err.printf("Reading: ");
+    String line = input.readLine();
+    System.err.printf(line);
+    return line;
+  }
+
+  private void writeLine(String message) throws IOException {
+    System.err.printf("Writing: %s\n", message);
+    output.write(message);
+    output.newLine();
+  }
+
   private void readExpected(String expect) throws IOException {
-    String found = input.readLine();
-    if (!found.equals(expect)) {
-      throw new RuntimeException(String.format(
-          "Expected '%s' from CMake server but got '%s'\n", expect, found));
+    String found = readLine();
+    if (found.equals(expect)) {
+      return;
     }
+    // Skip a blank line if there is one.
+    if (found.length()==0) {
+      readExpected(expect);
+      return;
+    }
+    throw new RuntimeException(String.format(
+        "Expected '%s' from CMake server but got '%s' (%s)\n", expect, found, found.length()));
   }
 
   private String readMessage() throws IOException {
     readExpected("[== \"CMake Server\" ==[");
-    String json = input.readLine();
+    String json = readLine();
     readExpected("]== \"CMake Server\" ==]");
     return json;
+  }
+
+  private void writeMessage(String message) throws IOException {
+    writeLine("[== \"CMake Server\" ==[");
+    writeLine(message);
+    writeLine("]== \"CMake Server\" ==]");
+    output.flush();
   }
 
   public void connect() throws IOException {
@@ -65,7 +92,7 @@ public class CMakeServerConnection {
     }
 
     input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    output = new OutputStreamWriter(process.getOutputStream());
+    output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
     // Read the 'hello' message from CMake server.
     readExpected("");
@@ -78,18 +105,11 @@ public class CMakeServerConnection {
     System.out.printf("\n<%s>\n", connectionMessage);
   }
 
-  private void writeMessageToServer(String message) throws IOException {
-    String bracketedMessage = "[== \"CMake Server\" ==[\n" +
-        message +
-        "\n]== \"CMake Server\" ==]\n";
-    System.out.printf("%s\n", bracketedMessage);
-    output.write(bracketedMessage);
-  }
 
   public int handshake(String message) throws IOException {
-    writeMessageToServer(message);
+    writeMessage(message);
     String result = readMessage();
-    throw new RuntimeException(result);
+    return 0;
   }
 
   public int handshake(String cookie, File sourceDirectory, File buildDirectory, String generator)
