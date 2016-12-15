@@ -16,23 +16,7 @@
 
 language: generic
 sudo: false
-install:
-  ############################################################################
-  # Install a recent CMake (unless already installed on OS X)
-  ############################################################################
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      CMAKE_URL="https://cmake.org/files/v3.7/cmake-3.7.1-Linux-x86_64.tar.gz"
-      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
-      BAZEL_CMAKE_INSTALL_FOLDER=$PWD/cmake
-    else
-      CMAKE_URL="https://cmake.org/files/v3.7/cmake-3.7.1-Darwin-x86_64.tar.gz"
-      mkdir cmake 
-      travis_retry curl "${CMAKE_URL}" -o "cmake.tar.gz"
-      cat cmake.tar.gz | tar --strip-components=1 -xz -C cmake
-      BAZEL_CMAKE_INSTALL_FOLDER=$PWD/cmake/CMake.app/Contents
-    fi
-    
+
 matrix:
   include:
     - os: linux
@@ -88,7 +72,7 @@ matrix:
             - bazel
 
       script:
-        - bazel test --test_output=errors --test_env BAZEL_CMAKE_INSTALL_FOLDER=$BAZEL_CMAKE_INSTALL_FOLDER //...
+        - bazel test --test_output=errors --test_env BAZEL_CMAKE_INSTALL_FOLDER=$PWD //...
 
     - os: osx
       env: TEST_RUNNER=bazel
@@ -97,4 +81,4 @@ matrix:
         - brew update
         - brew install bazel
       script:
-        - bazel test --test_output=errors --test_env BAZEL_CMAKE_INSTALL_FOLDER=$BAZEL_CMAKE_INSTALL_FOLDER //...
+        - bazel test --test_output=errors --test_env BAZEL_CMAKE_INSTALL_FOLDER=$PWD //...

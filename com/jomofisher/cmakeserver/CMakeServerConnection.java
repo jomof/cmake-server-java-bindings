@@ -21,11 +21,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 public class CMakeServerConnection {
   private final File cmakeInstallPath;
   Process process;
   BufferedReader input;
+  OutputStreamWriter output;
   String connectionMessage;
 
   CMakeServerConnection(File cmakeInstallPath) {
@@ -63,6 +65,7 @@ public class CMakeServerConnection {
     }
 
     input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    output = new OutputStreamWriter(process.getOutputStream());
 
     // Read the 'hello' message from CMake server.
     readExpected("");
@@ -73,6 +76,44 @@ public class CMakeServerConnection {
       throw new RuntimeException("Expected hello message from CMake server");
     }
     System.out.printf("\n<%s>\n", connectionMessage);
+  }
+
+  private void writeMessageToServer(String message) throws IOException {
+    String bracketedMessage = "[== \"CMake Server\" ==[\n" +
+        message +
+        "\n]== \"CMake Server\" ==]\n";
+    System.out.printf("%s\n", bracketedMessage);
+    output.write(bracketedMessage);
+  }
+
+  public int handshake(String message) throws IOException {
+    writeMessageToServer(message);
+    String result = readMessage();
+    throw new RuntimeException(result);
+  }
+
+  public int handshake(String cookie, File sourceDirectory, File buildDirectory, String generator)
+      throws IOException {
+    if (!sourceDirectory.isDirectory()) {
+      throw new RuntimeException(String.format(
+          "Expected sourceDirectory %s to exist", sourceDirectory));
+    }
+    if (!new File(sourceDirectory, "CMakeLists.txt").isFile()) {
+      throw new RuntimeException(String.format(
+          "Expected sourceDirectory %s to contain CMakeLists.txt", sourceDirectory));
+    }
+    return handshake(String.format(
+        "{\"cookie\":\"%s\", "
+            + "\"type\":\"handshake\", "
+            + "\"protocolVersion\":{\"major\":1}, "
+            + "\"sourceDirectory\":\"%s\", "
+            + "\"buildDirectory\":\"%s\", "
+            + "\"generator\":\"%s\"}",
+        cookie,
+        sourceDirectory,
+        buildDirectory,
+        generator));
+
   }
 }
 
