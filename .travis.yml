@@ -71,7 +71,7 @@ matrix:
             - bazel
 
       script:
-        - bazel test --test_output=errors --test_env BAZEL_CMAKE_INSTALL_FOLDER=$PWD //...
+        - bazel test --test_output=errors --test_env BAZEL_CMAKE_WORKSPACE_FOLDER=$PWD //...
 
     - os: osx
       env: TEST_RUNNER=bazel
@@ -80,4 +80,4 @@ matrix:
         - brew update
         - brew install bazel
       script:
-        - bazel test --test_output=errors --test_env BAZEL_CMAKE_INSTALL_FOLDER=$PWD //...
+        - bazel test --test_output=errors --test_env BAZEL_CMAKE_WORKSPACE_FOLDER=$PWD //...

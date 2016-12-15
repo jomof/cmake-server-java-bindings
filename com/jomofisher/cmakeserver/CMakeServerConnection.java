@@ -78,9 +78,9 @@ public class CMakeServerConnection {
 
   public void connect() throws IOException {
     if (!cmakeInstallPath.isDirectory()) {
-      throw new RuntimeException(
-          String.format("Expected CMake install path %s to be a folder",
-              cmakeInstallPath.getAbsolutePath()));
+//      throw new RuntimeException(
+//          String.format("Expected CMake install path %s to be a folder",
+//              cmakeInstallPath.getAbsolutePath()));
     }
 
     if (System.getProperty("os.name").contains("Windows")) {
