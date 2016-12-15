@@ -35,6 +35,7 @@ install:
       echo cmake && ls cmake
       echo cmake/CMake.app && ls cmake/CMake.app
       echo cmake/CMake.app/Contents && ls cmake/CMake.app/Contents
+      echo cmake/CMake.app/Contents/bin && ls ${BAZEL_CMAKE_INSTALL_FOLDER}/bin
       
     fi
     echo BAZEL_CMAKE_INSTALL_FOLDER=${BAZEL_CMAKE_INSTALL_FOLDER}
