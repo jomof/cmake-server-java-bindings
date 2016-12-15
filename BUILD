@@ -28,6 +28,7 @@ java_library(
         "com/jomofisher/cmakeserver/CMakeServer.java",
         "com/jomofisher/cmakeserver/CMakeServerConnection.java",
         "com/jomofisher/cmakeserver/HelloMessage.java",
+        "com/jomofisher/cmakeserver/Message.java",
         "com/jomofisher/cmakeserver/ProtocolVersion.java",
     ],
     deps = ["gson"],
