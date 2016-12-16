@@ -77,6 +77,10 @@ matrix:
       env: TEST_RUNNER=bazel
       sudo: false
       before_install:
+        - ls /Users/travis/build/jomof/cmake-server-java-bindings
+        - ls /Users/travis/build/jomof/cmake-server-java-bindings/test-data
+        - ls /Users/travis/build/jomof/cmake-server-java-bindings/test-data/cmake-projects
+        - ls /Users/travis/build/jomof/cmake-server-java-bindings/test-data/cmake-projects/hello-world
         - brew update
         - brew install bazel
       script:
