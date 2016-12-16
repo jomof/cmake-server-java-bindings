@@ -139,6 +139,19 @@ public class CMakeServerConnection {
 
   public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
       File buildDirectory, String generator) throws IOException {
+    if (!sourceDirectory.isDirectory()) {
+      File parent = sourceDirectory;
+      while(parent != null && !parent.isDirectory()) {
+        parent = parent.getParentFile();
+      }
+      if (parent == null) {
+        throw new RuntimeException(String.format(
+            "Folder %s didn't exist and neither did any parent folders", buildDirectory));
+      }
+      throw new RuntimeException(String.format(
+          "Folder %s didn't exist. Nearest existing parent folder is %s",
+          buildDirectory, parent));
+    }
     return handshake(String.format(
         "{\"cookie\":\"%s\", "
             + "\"type\":\"handshake\", "
