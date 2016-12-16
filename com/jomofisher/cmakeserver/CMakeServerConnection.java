@@ -18,35 +18,21 @@ import static com.jomofisher.cmakeserver.JsonUtils.checkForExtraFields;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class CMakeServerConnection {
-  private final File cmakeInstallPath;
-  private final boolean allowExtraMessageFields;
+  CMakeServerConnectionBuilder builder;
   Process process;
   BufferedReader input;
   BufferedWriter output;
 
-  CMakeServerConnection(File cmakeInstallPath) {
-    this(cmakeInstallPath, true);
-  }
-
-  CMakeServerConnection(File cmakeInstallPath, boolean allowExtraMessageFields) {
-    this.cmakeInstallPath = cmakeInstallPath;
-    this.allowExtraMessageFields = allowExtraMessageFields;
+  CMakeServerConnection(CMakeServerConnectionBuilder builder) {
+    this.builder = builder;
   }
 
   private String readLine() throws IOException {
@@ -90,17 +76,33 @@ public class CMakeServerConnection {
     output.flush();
   }
 
-
-
-
-  private <T extends Message> T decodeMessage(String message, Class<T> clazz) {
+  private <T extends Message> T decodeResponse(Class<T> clazz) throws IOException {
     Gson gson = new GsonBuilder()
         .create();
+    String message = readMessage();
     Message messageType = gson.fromJson(message, Message.class);
+
+    // Process interactive messages.
+    while (messageType.type.equals("message") || messageType.type.equals("progress")) {
+      if (builder.getProgressReceiver() != null) {
+        switch (messageType.type) {
+          case "message":
+            builder.getProgressReceiver().receive(gson.fromJson(message, MessageMessage.class));
+            break;
+          case "progress":
+            builder.getProgressReceiver().receive(gson.fromJson(message, ProgressMessage.class));
+            break;
+        }
+      }
+      message = readMessage();
+      messageType = gson.fromJson(message, Message.class);
+    }
+
+    // Process the final message.
     switch (messageType.type) {
       case "hello":
       case "reply":
-        if (!allowExtraMessageFields) {
+        if (!builder.getAllowExtraMessageFields()) {
           checkForExtraFields(message, clazz);
         }
         return gson.fromJson(message, clazz);
@@ -110,27 +112,56 @@ public class CMakeServerConnection {
   }
 
   public HelloMessage connect() throws IOException {
+    ProcessBuilder processBuilder;
     if (System.getProperty("os.name").contains("Windows")) {
-      process = new ProcessBuilder(String.format("%s\\bin\\cmake", cmakeInstallPath),
-          "-E", "server", "--experimental", "--debug").start();
+      processBuilder = new ProcessBuilder(String.format("%s\\bin\\cmake",
+          this.builder.getCmakeInstallPath()),
+          "-E", "server", "--experimental", "--debug");
     } else {
-      process = new ProcessBuilder(String.format("%s/bin/cmake", cmakeInstallPath),
-          "-E", "server", "--experimental", "--debug").start();
+      processBuilder = new ProcessBuilder(String.format("%s/bin/cmake",
+          this.builder.getCmakeInstallPath()),
+          "-E", "server", "--experimental", "--debug");
     }
+
+    processBuilder.environment().putAll(builder.environment());
+    process = processBuilder.start();
 
     input = new BufferedReader(new InputStreamReader(process.getInputStream()));
     output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-    return decodeMessage(readMessage(), HelloMessage.class);
+    return decodeResponse(HelloMessage.class);
   }
 
   public HandshakeReplyMessage handshake(String message) throws IOException {
     writeMessage(message);
-    return decodeMessage(readMessage(), HandshakeReplyMessage.class);
+    return decodeResponse(HandshakeReplyMessage.class);
   }
 
   public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
       File buildDirectory, String generator) throws IOException {
+    if (!sourceDirectory.exists()) {
+      throw new RuntimeException(String.format(
+          "Expected sourceDirectory %s to exist", sourceDirectory));
+    }
+    if (!new File(sourceDirectory, "CMakeLists.txt").exists()) {
+      throw new RuntimeException(String.format(
+          "Expected sourceDirectory %s to contain CMakeLists.txt", sourceDirectory));
+    }
+    return handshake(String.format(
+        "{\"cookie\":\"%s\", "
+            + "\"type\":\"handshake\", "
+            + "\"protocolVersion\":{\"major\":1}, "
+            + "\"sourceDirectory\":\"%s\", "
+            + "\"buildDirectory\":\"%s\", "
+            + "\"generator\":\"%s\"}",
+        cookie,
+        sourceDirectory.getAbsolutePath(),
+        buildDirectory.getAbsolutePath(),
+        generator));
+  }
+
+  public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
+      File buildDirectory) throws IOException {
     if (!sourceDirectory.isDirectory()) {
       throw new RuntimeException(String.format(
           "Expected sourceDirectory %s to exist", sourceDirectory));
@@ -144,17 +175,33 @@ public class CMakeServerConnection {
             + "\"type\":\"handshake\", "
             + "\"protocolVersion\":{\"major\":1}, "
             + "\"sourceDirectory\":\"%s\", "
-            + "\"buildDirectory\":\"%s\", "
-            + "\"generator\":\"%s\"}",
+            + "\"buildDirectory\":\"%s\"}",
         cookie,
-        sourceDirectory,
-        buildDirectory,
-        generator));
+        sourceDirectory.getAbsolutePath(),
+        buildDirectory.getAbsolutePath()));
   }
 
   public GlobalSettingsReplyMessage globalSettings() throws IOException {
     writeMessage("{\"type\":\"globalSettings\"}");
-    return decodeMessage(readMessage(), GlobalSettingsReplyMessage.class);
+    return decodeResponse(GlobalSettingsReplyMessage.class);
+  }
+
+  public ConfigureReplyMessage configure (String... cacheArguments) throws IOException {
+    StringBuilder cacheArgumentBuilder = new StringBuilder();
+    for (int i = 0; i < cacheArguments.length; ++i) {
+      if (i != 0) {
+        cacheArgumentBuilder.append(", ");
+      }
+      cacheArgumentBuilder.append(String.format("\"%s\"", cacheArguments[i]));
+    }
+    writeMessage("{\"type\":\"configure\", \"cacheArguments\":["
+        + cacheArgumentBuilder.toString() + "]}");
+    return decodeResponse(ConfigureReplyMessage.class);
+  }
+
+  public ComputeReplyMessage compute() throws IOException {
+    writeMessage("{\"type\":\"compute\"}");
+    return decodeResponse(ComputeReplyMessage.class);
   }
 }
 

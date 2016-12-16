@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.jomofisher.cmakeserver;
-import static com.jomofisher.cmakeserver.TestCMakeServer.OSType.Linux;
-import static com.jomofisher.cmakeserver.TestCMakeServer.OSType.MacOS;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -31,7 +29,6 @@ public class TestCMakeServer {
     };
 
     static OSType detectedOS;
-
     static {
       if (detectedOS == null) {
         String OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
@@ -65,6 +62,46 @@ public class TestCMakeServer {
     }
   }
 
+  private File getNinjaInstallFolder() {
+    File workspaceFolder = getWorkspaceFolder();
+    switch (detectedOS) {
+      case Linux: return new File(workspaceFolder, "prebuilts/ninja-1.7.2-Linux");
+      case MacOS: return new File(workspaceFolder, "prebuilts/ninja-1.7.2-Darwin");
+      default:
+        throw new RuntimeException("OS not yet supported: "+detectedOS);
+    }
+  }
+
+  private CMakeServerConnectionBuilder getConnectionBuilder() {
+    CMakeServerConnectionBuilder builder = new CMakeServerConnectionBuilder(getCMakeInstallFolder())
+        .setAllowExtraMessageFields(false)
+        .setProgressReceiver(new ProgressReceiver() {
+          @Override
+          public void receive(Message message) {
+            switch (message.type) {
+              case "message":
+                MessageMessage messageMessage = (MessageMessage) message;
+                System.err.printf("Message: %s\n", messageMessage.message);
+                break;
+              case "progress":
+                ProgressMessage progressMessage = (ProgressMessage) message;
+                System.err.printf("Progress: %s of %s\n", progressMessage.progressCurrent,
+                    progressMessage.progressMaximum);
+                break;
+              default:
+                throw new RuntimeException("Unexpected message type: " + message.type);
+            }
+          }
+        });
+
+    // Add prebuilts ninja to the install path
+    String pathKey = detectedOS == OSType.Windows ? "Path" : "PATH";
+    String path = getNinjaInstallFolder() + ":" + builder.environment().get(pathKey);
+    builder.environment().put(pathKey, path);
+
+    return builder;
+  }
+
   private File getSampleProjectsFolder() {
     File workspaceFolder = getWorkspaceFolder();
     return new File(workspaceFolder, "test-data/cmake-projects/");
@@ -72,14 +109,12 @@ public class TestCMakeServer {
 
   @Test
   public void testConnect() throws Exception {
-    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder(),
-        false /* allowExtraMessageFields */);
+    CMakeServerConnection connection = getConnectionBuilder().create();
   }
 
   @Test
   public void testHandshake() throws Exception {
-    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder(),
-        false /* allowExtraMessageFields */);
+    CMakeServerConnection connection = getConnectionBuilder().create();
     HandshakeReplyMessage reply  = connection.handshake("my-cookie",
         new File(getSampleProjectsFolder(), "hello-world"),
         new File("."),
@@ -87,9 +122,30 @@ public class TestCMakeServer {
   }
 
   @Test
+  public void testConfigure() throws Exception {
+    CMakeServerConnection connection = getConnectionBuilder().create();
+    HandshakeReplyMessage reply  = connection.handshake("my-cookie",
+        new File(getSampleProjectsFolder(), "hello-world"),
+        new File("."),
+        "Ninja");
+
+    ConfigureReplyMessage configureReply  = connection.configure();
+  }
+
+  @Test
+  public void testCompute() throws Exception {
+    CMakeServerConnection connection = getConnectionBuilder().create();
+    HandshakeReplyMessage reply  = connection.handshake("my-cookie",
+        new File(getSampleProjectsFolder(), "hello-world"),
+        new File("."),
+        "Ninja");
+    ConfigureReplyMessage configureReply  = connection.configure();
+    ComputeReplyMessage computeReply  = connection.compute();
+  }
+
+  @Test
   public void testGlobalSettings() throws Exception {
-    CMakeServerConnection connection = CMakeServer.connect(getCMakeInstallFolder(),
-        false /* allowExtraMessageFields */);
+    CMakeServerConnection connection = getConnectionBuilder().create();
     connection.handshake("my-cookie",
         new File(getSampleProjectsFolder(), "hello-world"),
         new File("."),
