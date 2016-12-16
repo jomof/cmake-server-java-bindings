@@ -139,10 +139,6 @@ public class CMakeServerConnection {
 
   public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
       File buildDirectory, String generator) throws IOException {
-    if (!sourceDirectory.exists()) {
-      throw new RuntimeException(String.format(
-          "Expected sourceDirectory %s to exist", sourceDirectory));
-    }
     if (!new File(sourceDirectory, "CMakeLists.txt").exists()) {
       throw new RuntimeException(String.format(
           "Expected sourceDirectory %s to contain CMakeLists.txt", sourceDirectory));
