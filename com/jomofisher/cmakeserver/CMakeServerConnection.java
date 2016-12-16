@@ -195,5 +195,10 @@ public class CMakeServerConnection {
     writeMessage("{\"type\":\"compute\"}");
     return decodeResponse(ComputeReplyMessage.class);
   }
+
+  public CodeModelReplyMessage codemodel() throws IOException {
+    writeMessage("{\"type\":\"codemodel\"}");
+    return decodeResponse(CodeModelReplyMessage.class);
+  }
 }
 

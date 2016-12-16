@@ -144,6 +144,18 @@ public class TestCMakeServer {
   }
 
   @Test
+  public void testCodeModel() throws Exception {
+    CMakeServerConnection connection = getConnectionBuilder().create();
+    HandshakeReplyMessage reply  = connection.handshake("my-cookie",
+        new File(getSampleProjectsFolder(), "hello-world"),
+        new File("."),
+        "Ninja");
+    ConfigureReplyMessage configureReply  = connection.configure();
+    ComputeReplyMessage computeReply  = connection.compute();
+    CodeModelReplyMessage codemodelReply  = connection.codemodel();
+  }
+
+  @Test
   public void testGlobalSettings() throws Exception {
     CMakeServerConnection connection = getConnectionBuilder().create();
     connection.handshake("my-cookie",
