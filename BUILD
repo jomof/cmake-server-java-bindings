@@ -35,6 +35,7 @@ java_library(
         "com/jomofisher/cmakeserver/FileGroup.java",
         "com/jomofisher/cmakeserver/Generator.java",
         "com/jomofisher/cmakeserver/GlobalSettingsReplyMessage.java",
+        "com/jomofisher/cmakeserver/HandshakeMessage.java",
         "com/jomofisher/cmakeserver/HandshakeReplyMessage.java",
         "com/jomofisher/cmakeserver/HelloMessage.java",
         "com/jomofisher/cmakeserver/JsonUtils.java",
