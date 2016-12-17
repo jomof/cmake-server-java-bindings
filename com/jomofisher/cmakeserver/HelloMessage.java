@@ -15,8 +15,6 @@
  */
 package com.jomofisher.cmakeserver;
 
-import java.util.List;
-
 public class HelloMessage extends Message {
   public ProtocolVersion supportedProtocolVersions[];
 }

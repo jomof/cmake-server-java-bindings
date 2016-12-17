@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 package com.jomofisher.cmakeserver;
-import static com.jomofisher.cmakeserver.JsonUtils.checkForExtraFields;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+
+import java.io.*;
+
+import static com.jomofisher.cmakeserver.JsonUtils.checkForExtraFields;
 
 public class CMakeServerConnection {
-  CMakeServerConnectionBuilder builder;
-  Process process;
-  BufferedReader input;
-  BufferedWriter output;
+  private final CMakeServerConnectionBuilder builder;
+  private Process process;
+  private BufferedReader input;
+  private BufferedWriter output;
 
   CMakeServerConnection(CMakeServerConnectionBuilder builder) {
     this.builder = builder;
@@ -54,12 +51,12 @@ public class CMakeServerConnection {
       return;
     }
     // Skip a blank line if there is one.
-    if (found.length()==0) {
+    if (found.length() == 0) {
       readExpected(expect);
       return;
     }
     throw new RuntimeException(String.format(
-        "Expected '%s' from CMake server but got '%s' (%s)\n", expect, found, found.length()));
+      "Expected '%s' from CMake server but got '%s' (%s)\n", expect, found, found.length()));
   }
 
   private String readMessage() throws IOException {
@@ -78,7 +75,7 @@ public class CMakeServerConnection {
 
   private <T extends Message> T decodeResponse(Class<T> clazz) throws IOException {
     Gson gson = new GsonBuilder()
-        .create();
+      .create();
     String message = readMessage();
     Message messageType = gson.fromJson(message, Message.class);
 
@@ -115,12 +112,12 @@ public class CMakeServerConnection {
     ProcessBuilder processBuilder;
     if (System.getProperty("os.name").contains("Windows")) {
       processBuilder = new ProcessBuilder(String.format("%s\\bin\\cmake",
-          this.builder.getCmakeInstallPath()),
-          "-E", "server", "--experimental", "--debug");
+        this.builder.getCmakeInstallPath()),
+        "-E", "server", "--experimental", "--debug");
     } else {
       processBuilder = new ProcessBuilder(String.format("%s/bin/cmake",
-          this.builder.getCmakeInstallPath()),
-          "-E", "server", "--experimental", "--debug");
+        this.builder.getCmakeInstallPath()),
+        "-E", "server", "--experimental", "--debug");
     }
 
     processBuilder.environment().putAll(builder.environment());
@@ -132,58 +129,76 @@ public class CMakeServerConnection {
     return decodeResponse(HelloMessage.class);
   }
 
-  public HandshakeReplyMessage handshake(String message) throws IOException {
+  private HandshakeReplyMessage handshake(String message) throws IOException {
     writeMessage(message);
     return decodeResponse(HandshakeReplyMessage.class);
   }
 
-  public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
-      File buildDirectory, String generator) throws IOException {
-    if (!sourceDirectory.isDirectory()) {
-      File parent = sourceDirectory;
-      while(parent != null && !parent.isDirectory()) {
+  void checkFolderExists(String path) {
+    if (path == null) {
+      throw new RuntimeException("Path was null");
+    }
+    File directory = new File(path);
+    if (!directory.isDirectory()) {
+      File parent = directory;
+      while (parent != null && !parent.isDirectory()) {
         parent = parent.getParentFile();
       }
       if (parent == null) {
         throw new RuntimeException(String.format(
-            "Folder %s didn't exist and neither did any parent folders", buildDirectory));
+          "Folder %s didn't exist and neither did any parent folders", directory));
       }
       throw new RuntimeException(String.format(
-          "Folder %s didn't exist. Nearest existing parent folder is %s",
-          buildDirectory, parent));
+        "Folder %s didn't exist. Nearest existing parent folder is %s",
+        directory, parent));
     }
-    return handshake(String.format(
-        "{\"cookie\":\"%s\", "
-            + "\"type\":\"handshake\", "
-            + "\"protocolVersion\":{\"major\":1}, "
-            + "\"sourceDirectory\":\"%s\", "
-            + "\"buildDirectory\":\"%s\", "
-            + "\"generator\":\"%s\"}",
-        cookie,
-        sourceDirectory.getAbsolutePath(),
-        buildDirectory.getAbsolutePath(),
-        generator));
+  }
+
+  public HandshakeReplyMessage handshake(HandshakeMessage message) throws IOException {
+    checkFolderExists(message.buildDirectory);
+    checkFolderExists(message.sourceDirectory);
+    writeMessage(new GsonBuilder()
+      .setPrettyPrinting()
+      .create()
+      .toJson(message));
+    return decodeResponse(HandshakeReplyMessage.class);
   }
 
   public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
-      File buildDirectory) throws IOException {
+                                         File buildDirectory, String generator) throws IOException {
+
+    return handshake(String.format(
+      "{\"cookie\":\"%s\", "
+        + "\"type\":\"handshake\", "
+        + "\"protocolVersion\":{\"major\":1}, "
+        + "\"sourceDirectory\":\"%s\", "
+        + "\"buildDirectory\":\"%s\", "
+        + "\"generator\":\"%s\"}",
+      cookie,
+      sourceDirectory.getAbsolutePath(),
+      buildDirectory.getAbsolutePath(),
+      generator));
+  }
+
+  public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
+                                         File buildDirectory) throws IOException {
     if (!sourceDirectory.isDirectory()) {
       throw new RuntimeException(String.format(
-          "Expected sourceDirectory %s to exist", sourceDirectory));
+        "Expected sourceDirectory %s to exist", sourceDirectory));
     }
     if (!new File(sourceDirectory, "CMakeLists.txt").isFile()) {
       throw new RuntimeException(String.format(
-          "Expected sourceDirectory %s to contain CMakeLists.txt", sourceDirectory));
+        "Expected sourceDirectory %s to contain CMakeLists.txt", sourceDirectory));
     }
     return handshake(String.format(
-        "{\"cookie\":\"%s\", "
-            + "\"type\":\"handshake\", "
-            + "\"protocolVersion\":{\"major\":1}, "
-            + "\"sourceDirectory\":\"%s\", "
-            + "\"buildDirectory\":\"%s\"}",
-        cookie,
-        sourceDirectory.getAbsolutePath(),
-        buildDirectory.getAbsolutePath()));
+      "{\"cookie\":\"%s\", "
+        + "\"type\":\"handshake\", "
+        + "\"protocolVersion\":{\"major\":1}, "
+        + "\"sourceDirectory\":\"%s\", "
+        + "\"buildDirectory\":\"%s\"}",
+      cookie,
+      sourceDirectory.getAbsolutePath(),
+      buildDirectory.getAbsolutePath()));
   }
 
   public GlobalSettingsReplyMessage globalSettings() throws IOException {
@@ -191,7 +206,7 @@ public class CMakeServerConnection {
     return decodeResponse(GlobalSettingsReplyMessage.class);
   }
 
-  public ConfigureReplyMessage configure (String... cacheArguments) throws IOException {
+  public ConfigureReplyMessage configure(String... cacheArguments) throws IOException {
     StringBuilder cacheArgumentBuilder = new StringBuilder();
     for (int i = 0; i < cacheArguments.length; ++i) {
       if (i != 0) {
@@ -200,7 +215,7 @@ public class CMakeServerConnection {
       cacheArgumentBuilder.append(String.format("\"%s\"", cacheArguments[i]));
     }
     writeMessage("{\"type\":\"configure\", \"cacheArguments\":["
-        + cacheArgumentBuilder.toString() + "]}");
+      + cacheArgumentBuilder.toString() + "]}");
     return decodeResponse(ConfigureReplyMessage.class);
   }
 
