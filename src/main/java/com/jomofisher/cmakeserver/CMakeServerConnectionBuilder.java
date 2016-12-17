@@ -15,6 +15,8 @@
  */
 package com.jomofisher.cmakeserver;
 
+import com.jomofisher.cmakeserver.model.HelloMessage;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;

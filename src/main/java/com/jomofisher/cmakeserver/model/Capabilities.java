@@ -1,4 +1,4 @@
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmakeserver.model;
 
 @SuppressWarnings("unused")
 public class Capabilities {

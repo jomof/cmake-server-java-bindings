@@ -1,7 +1,7 @@
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmakeserver.model;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class HandshakeMessage extends Message {
+public class HandshakeMessage extends BaseMessage {
   public String cookie;
   public ProtocolVersion protocolVersion;
   public String sourceDirectory;

@@ -1,7 +1,7 @@
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmakeserver.model;
 
 @SuppressWarnings("unused")
-public class GlobalSettingsReplyMessage extends Message {
+public class GlobalSettingsReplyMessage extends BaseMessage {
   public String cookie;
   public String inReplyTo;
   public String buildDirectory;

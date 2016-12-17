@@ -1,4 +1,4 @@
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmakeserver.model;
 
 /**
  * Example,
@@ -42,7 +42,7 @@ package com.jomofisher.cmakeserver;
  * }
  */
 @SuppressWarnings("unused")
-public class CodeModelReplyMessage extends Message {
+public class CodeModelReplyMessage extends BaseMessage {
   public Configuration configurations[];
   public String cookie;
   public String inReplyTo;

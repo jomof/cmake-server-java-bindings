@@ -15,6 +15,7 @@
  */
 package com.jomofisher.cmakeserver;
 
+import com.jomofisher.cmakeserver.model.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -52,9 +53,6 @@ public class TestCMakeServer {
     }
 
     private File getWorkspaceFolder() {
-        if (System.getenv("BAZEL_CMAKE_WORKSPACE_FOLDER") != null) {
-            return new File(System.getenv("BAZEL_CMAKE_WORKSPACE_FOLDER"));
-        }
         return new File(".").getAbsoluteFile();
     }
 
@@ -91,7 +89,7 @@ public class TestCMakeServer {
                 .setAllowExtraMessageFields(false)
                 .setProgressReceiver(new ProgressReceiver() {
                     @Override
-                    public void receive(Message message) {
+                    public void receive(BaseMessage message) {
                         switch (message.type) {
                             case "message":
                                 MessageMessage messageMessage = (MessageMessage) message;

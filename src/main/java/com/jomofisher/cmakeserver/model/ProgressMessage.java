@@ -1,4 +1,4 @@
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmakeserver.model;
 
 /**
  * Example,
@@ -14,7 +14,7 @@ package com.jomofisher.cmakeserver;
  * }
  */
 @SuppressWarnings("unused")
-class ProgressMessage extends Message {
+public class ProgressMessage extends BaseMessage {
   public String cookie;
   public String inReplyTo;
   public int progressCurrent;

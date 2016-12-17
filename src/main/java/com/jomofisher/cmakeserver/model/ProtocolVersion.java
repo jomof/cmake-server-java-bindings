@@ -13,9 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmakeserver.model;
 
-@SuppressWarnings("unused")
-public class HelloMessage extends Message {
-  public ProtocolVersion supportedProtocolVersions[];
+@SuppressWarnings({"WeakerAccess", "unused"})
+public class ProtocolVersion {
+  public Boolean isExperimental;
+  public Integer major;
+  public Integer minor;
+
+
+  public ProtocolVersion setExperimental(boolean experimental) {
+    isExperimental = experimental;
+    return this;
+  }
+
+  public ProtocolVersion setMajor(int major) {
+    this.major = major;
+    return this;
+  }
+
+  public ProtocolVersion setMinor(int minor) {
+    this.minor = minor;
+    return this;
+  }
 }

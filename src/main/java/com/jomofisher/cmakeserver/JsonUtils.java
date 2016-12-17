@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.jomofisher.cmakeserver.model.BaseMessage;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map.Entry;
 
 class JsonUtils {
 
-  static <T extends Message> void checkForExtraFields(String message, Class<T> clazz) {
+  static <T extends BaseMessage> void checkForExtraFields(String message, Class<T> clazz) {
     checkJsonElementAgainstJava(new JsonParser().parse(message), clazz);
   }
 

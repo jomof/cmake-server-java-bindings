@@ -17,6 +17,7 @@ package com.jomofisher.cmakeserver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.jomofisher.cmakeserver.model.*;
 
 import java.io.*;
 
@@ -73,11 +74,11 @@ public class CMakeServerConnection {
     output.flush();
   }
 
-  private <T extends Message> T decodeResponse(Class<T> clazz) throws IOException {
+  private <T extends BaseMessage> T decodeResponse(Class<T> clazz) throws IOException {
     Gson gson = new GsonBuilder()
       .create();
     String message = readMessage();
-    Message messageType = gson.fromJson(message, Message.class);
+    BaseMessage messageType = gson.fromJson(message, BaseMessage.class);
 
     // Process interactive messages.
     while (messageType.type.equals("message") || messageType.type.equals("progress")) {
@@ -92,7 +93,7 @@ public class CMakeServerConnection {
         }
       }
       message = readMessage();
-      messageType = gson.fromJson(message, Message.class);
+      messageType = gson.fromJson(message, BaseMessage.class);
     }
 
     // Process the final message.
