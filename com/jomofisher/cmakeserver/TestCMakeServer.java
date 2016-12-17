@@ -109,9 +109,16 @@ public class TestCMakeServer {
       });
 
     // Add prebuilts ninja to the install path
-    String pathKey = detectedOS == OSType.Windows ? "Path" : "PATH";
-    String path = getNinjaInstallFolder() + ":" + builder.environment().get(pathKey);
-    builder.environment().put(pathKey, path);
+    if (detectedOS == OSType.Windows) {
+      String path = getNinjaInstallFolder() + ";" + builder.environment().get("Path");
+      path = "c:\\tools\\msys64\\usr\\bin;" + path;
+      builder.environment().put("Path", path);
+//      builder.environment().put("CXX", "gcc");
+//      builder.environment().put("CC", "gcc");
+    } else {
+      String path = getNinjaInstallFolder() + ":" + builder.environment().get("PATH");
+      builder.environment().put("PATH", path);
+    }
 
     return builder;
   }
@@ -119,6 +126,16 @@ public class TestCMakeServer {
   private File getSampleProjectsFolder() {
     File workspaceFolder = getWorkspaceFolder();
     return new File(workspaceFolder, "test-data/cmake-projects/");
+  }
+
+  private HandshakeMessage getHelloWorldHandshake() throws IOException {
+    return new HandshakeMessage()
+      .setCookie("my-cookie")
+      .setGenerator("Ninja")
+      .setSourceDirectory(new File(getSampleProjectsFolder(), "hello-world").getAbsolutePath().replace('\\', '/'))
+      .setBuildDirectory(getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\','/'))
+      .setProtocolVersion(new ProtocolVersion()
+        .setMajor(1));
   }
 
   @Test
@@ -129,34 +146,20 @@ public class TestCMakeServer {
   @Test
   public void testHandshake() throws Exception {
     CMakeServerConnection connection = getConnectionBuilder().create();
-    HandshakeMessage message = new HandshakeMessage()
-      .setCookie("my-cookie")
-      .setGenerator("Ninja")
-      .setSourceDirectory(new File(getSampleProjectsFolder(), "hello-world").getAbsolutePath())
-      .setBuildDirectory(getTemporaryBuildOutputFolder().getAbsolutePath())
-      .setProtocolVersion(new ProtocolVersion()
-        .setMajor(1));
-    HandshakeReplyMessage reply = connection.handshake(message);
+    HandshakeReplyMessage handshakeReply = connection.handshake(getHelloWorldHandshake());
   }
 
   @Test
   public void testConfigure() throws Exception {
     CMakeServerConnection connection = getConnectionBuilder().create();
-    HandshakeReplyMessage reply = connection.handshake("my-cookie",
-      new File(getSampleProjectsFolder(), "hello-world"),
-      new File("."),
-      "Ninja");
-
+    HandshakeReplyMessage handshakeReply = connection.handshake(getHelloWorldHandshake());
     ConfigureReplyMessage configureReply = connection.configure();
   }
 
   @Test
   public void testCompute() throws Exception {
     CMakeServerConnection connection = getConnectionBuilder().create();
-    HandshakeReplyMessage reply = connection.handshake("my-cookie",
-      new File(getSampleProjectsFolder(), "hello-world"),
-      new File("."),
-      "Ninja");
+    HandshakeReplyMessage handshakeReply = connection.handshake(getHelloWorldHandshake());
     ConfigureReplyMessage configureReply = connection.configure();
     ComputeReplyMessage computeReply = connection.compute();
   }
@@ -164,10 +167,7 @@ public class TestCMakeServer {
   @Test
   public void testCodeModel() throws Exception {
     CMakeServerConnection connection = getConnectionBuilder().create();
-    HandshakeReplyMessage reply = connection.handshake("my-cookie",
-      new File(getSampleProjectsFolder(), "hello-world"),
-      new File("."),
-      "Ninja");
+    HandshakeReplyMessage handshakeReply = connection.handshake(getHelloWorldHandshake());
     ConfigureReplyMessage configureReply = connection.configure();
     ComputeReplyMessage computeReply = connection.compute();
     CodeModelReplyMessage codemodelReply = connection.codemodel();
@@ -176,11 +176,8 @@ public class TestCMakeServer {
   @Test
   public void testGlobalSettings() throws Exception {
     CMakeServerConnection connection = getConnectionBuilder().create();
-    connection.handshake("my-cookie",
-      new File(getSampleProjectsFolder(), "hello-world"),
-      new File("."),
-      "Ninja");
-    GlobalSettingsReplyMessage reply = connection.globalSettings();
+    HandshakeReplyMessage handshakeReply = connection.handshake(getHelloWorldHandshake());
+    GlobalSettingsReplyMessage globalSettingsReply = connection.globalSettings();
   }
 
   enum OSType {

@@ -47,10 +47,8 @@ class JsonUtils {
   }
 
   private static Map<String, Field> getFieldNames(Class clazz) {
-    System.err.printf("Adding fields for %s\n", clazz);
     Map<String, Field> fields = new HashMap<>();
     for (Field field : clazz.getFields()) {
-      System.err.printf("Adding %s\n", field.getName());
       fields.put(field.getName(), field);
     }
     Class parent = clazz.getSuperclass();

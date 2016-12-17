@@ -164,43 +164,6 @@ public class CMakeServerConnection {
     return decodeResponse(HandshakeReplyMessage.class);
   }
 
-  public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
-                                         File buildDirectory, String generator) throws IOException {
-
-    return handshake(String.format(
-      "{\"cookie\":\"%s\", "
-        + "\"type\":\"handshake\", "
-        + "\"protocolVersion\":{\"major\":1}, "
-        + "\"sourceDirectory\":\"%s\", "
-        + "\"buildDirectory\":\"%s\", "
-        + "\"generator\":\"%s\"}",
-      cookie,
-      sourceDirectory.getAbsolutePath(),
-      buildDirectory.getAbsolutePath(),
-      generator));
-  }
-
-  public HandshakeReplyMessage handshake(String cookie, File sourceDirectory,
-                                         File buildDirectory) throws IOException {
-    if (!sourceDirectory.isDirectory()) {
-      throw new RuntimeException(String.format(
-        "Expected sourceDirectory %s to exist", sourceDirectory));
-    }
-    if (!new File(sourceDirectory, "CMakeLists.txt").isFile()) {
-      throw new RuntimeException(String.format(
-        "Expected sourceDirectory %s to contain CMakeLists.txt", sourceDirectory));
-    }
-    return handshake(String.format(
-      "{\"cookie\":\"%s\", "
-        + "\"type\":\"handshake\", "
-        + "\"protocolVersion\":{\"major\":1}, "
-        + "\"sourceDirectory\":\"%s\", "
-        + "\"buildDirectory\":\"%s\"}",
-      cookie,
-      sourceDirectory.getAbsolutePath(),
-      buildDirectory.getAbsolutePath()));
-  }
-
   public GlobalSettingsReplyMessage globalSettings() throws IOException {
     writeMessage("{\"type\":\"globalSettings\"}");
     return decodeResponse(GlobalSettingsReplyMessage.class);
