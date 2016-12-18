@@ -1,5 +1,9 @@
 group 'jomofisher'
-version '1.0-alpha1'
+if (System.getenv()["TRAVIS_TAG"] != null) {
+    version System.getenv()["TRAVIS_TAG"]
+} else {
+    version ''
+}
 
 apply plugin: 'java'
 
