@@ -15,10 +15,10 @@ package com.jomofisher.cmakeserver.model;
  */
 @SuppressWarnings("unused")
 public class ProgressMessage extends BaseMessage {
-  public String cookie;
-  public String inReplyTo;
-  public int progressCurrent;
-  public int progressMaximum;
-  public String progressMessage;
-  public int progressMinimum;
+    public String cookie;
+    public String inReplyTo;
+    public int progressCurrent;
+    public int progressMaximum;
+    public String progressMessage;
+    public int progressMinimum;
 }

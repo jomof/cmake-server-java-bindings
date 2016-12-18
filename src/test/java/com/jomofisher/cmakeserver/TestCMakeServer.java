@@ -136,7 +136,7 @@ public class TestCMakeServer {
                 .setCookie("my-cookie")
                 .setGenerator("Ninja")
                 .setSourceDirectory(new File(getSampleProjectsFolder(), "hello-world").getAbsolutePath().replace('\\', '/'))
-                .setBuildDirectory(getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\','/'))
+                .setBuildDirectory(getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/'))
                 .setProtocolVersion(new ProtocolVersion()
                         .setMajor(1));
     }

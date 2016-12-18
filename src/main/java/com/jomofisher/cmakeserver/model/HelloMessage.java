@@ -17,5 +17,5 @@ package com.jomofisher.cmakeserver.model;
 
 @SuppressWarnings("unused")
 public class HelloMessage extends BaseMessage {
-  public ProtocolVersion supportedProtocolVersions[];
+    public ProtocolVersion supportedProtocolVersions[];
 }

@@ -13,8 +13,8 @@ package com.jomofisher.cmakeserver.model;
  */
 @SuppressWarnings("unused")
 public class MessageMessage extends BaseMessage {
-  public String cookie;
-  public String inReplyTo;
-  public String message;
-  public String title;
+    public String cookie;
+    public String inReplyTo;
+    public String message;
+    public String title;
 }

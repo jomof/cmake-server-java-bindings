@@ -22,61 +22,61 @@ import java.io.IOException;
 import java.util.Map;
 
 public class CMakeServerConnectionBuilder {
-  final private File cmakeInstallPath;
-  final private Map<String, String> cmakeProcessEnvironment;
-  private boolean allowExtraMessageFields = true;
-  private ProgressReceiver progressReceiver = null;
-  private DiagnosticReceiver diagnosticReceiver = null;
+    final private File cmakeInstallPath;
+    final private Map<String, String> cmakeProcessEnvironment;
+    private boolean allowExtraMessageFields = true;
+    private ProgressReceiver progressReceiver = null;
+    private DiagnosticReceiver diagnosticReceiver = null;
 
-  public CMakeServerConnectionBuilder(File cmakeInstallPath) {
-    this.cmakeInstallPath = cmakeInstallPath;
-    this.cmakeProcessEnvironment = new ProcessBuilder().environment();
-  }
+    public CMakeServerConnectionBuilder(File cmakeInstallPath) {
+        this.cmakeInstallPath = cmakeInstallPath;
+        this.cmakeProcessEnvironment = new ProcessBuilder().environment();
+    }
 
-  /**
-   * Start the server and return a connection to interact with it.
-   *
-   * @return A connection to the CMake server that can be used to interact with.
-   * @throws IOException if there was a problem spawing the process.
-   */
-  public CMakeServerConnection create() throws IOException {
-    CMakeServerConnection connection = new CMakeServerConnection(this);
-    HelloMessage reply = connection.connect();
-    return connection;
-  }
+    /**
+     * Start the server and return a connection to interact with it.
+     *
+     * @return A connection to the CMake server that can be used to interact with.
+     * @throws IOException if there was a problem spawing the process.
+     */
+    public CMakeServerConnection create() throws IOException {
+        CMakeServerConnection connection = new CMakeServerConnection(this);
+        HelloMessage reply = connection.connect();
+        return connection;
+    }
 
-  public File getCmakeInstallPath() {
-    return cmakeInstallPath;
-  }
+    public File getCmakeInstallPath() {
+        return cmakeInstallPath;
+    }
 
-  public boolean getAllowExtraMessageFields() {
-    return allowExtraMessageFields;
-  }
+    public boolean getAllowExtraMessageFields() {
+        return allowExtraMessageFields;
+    }
 
-  public CMakeServerConnectionBuilder setAllowExtraMessageFields(boolean allowExtraMessageFields) {
-    this.allowExtraMessageFields = allowExtraMessageFields;
-    return this;
-  }
+    public CMakeServerConnectionBuilder setAllowExtraMessageFields(boolean allowExtraMessageFields) {
+        this.allowExtraMessageFields = allowExtraMessageFields;
+        return this;
+    }
 
-  public ProgressReceiver getProgressReceiver() {
-    return progressReceiver;
-  }
+    public ProgressReceiver getProgressReceiver() {
+        return progressReceiver;
+    }
 
-  public CMakeServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {
-    this.progressReceiver = progressReceiver;
-    return this;
-  }
+    public CMakeServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {
+        this.progressReceiver = progressReceiver;
+        return this;
+    }
 
-  public DiagnosticReceiver getDiagnosticReceiver() {
-    return diagnosticReceiver;
-  }
+    public DiagnosticReceiver getDiagnosticReceiver() {
+        return diagnosticReceiver;
+    }
 
-  public CMakeServerConnectionBuilder setDiagnosticReceiver(DiagnosticReceiver diagnosticReceiver) {
-    this.diagnosticReceiver = diagnosticReceiver;
-    return this;
-  }
+    public CMakeServerConnectionBuilder setDiagnosticReceiver(DiagnosticReceiver diagnosticReceiver) {
+        this.diagnosticReceiver = diagnosticReceiver;
+        return this;
+    }
 
-  public Map<String, String> environment() {
-    return this.cmakeProcessEnvironment;
-  }
+    public Map<String, String> environment() {
+        return this.cmakeProcessEnvironment;
+    }
 }

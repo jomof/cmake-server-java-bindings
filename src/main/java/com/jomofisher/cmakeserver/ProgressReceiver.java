@@ -7,5 +7,5 @@ import com.jomofisher.cmakeserver.model.BaseMessage;
  * BaseMessage types: "message", "progress"
  */
 public interface ProgressReceiver {
-  void receive(BaseMessage baseMessage);
+    void receive(BaseMessage baseMessage);
 }
