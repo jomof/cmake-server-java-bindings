@@ -1,0 +1,1 @@
+https://dl.google.com/android/repository/cmake-3.6.3155560-windows-x86_64.zip
