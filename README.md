@@ -19,3 +19,9 @@ Creates java bindings for CMake Server. Example usage,
             CodeModelReplyMessage codemodelReply = connection.codemodel();
 
 [Download cmakeserver-1.0-alpha1.jar] (https://github.com/jomof/cmake-server-java-bindings/releases/tag/cmakeserver-1.0-alpha1)
+
+Or build it yourself:
+
+    git clone https://github.com/jomof/cmake-server-java-bindings.git
+    cd cmake-server-java-bindings
+    ./gradlew assemble check
