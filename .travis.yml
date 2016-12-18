@@ -4,6 +4,8 @@ matrix:
   include:
   - os: linux
     dist: trusty
+    before_install:
+      - printenv | grep TRAVIS_
   - os: osx
 deploy:
   provider: releases
