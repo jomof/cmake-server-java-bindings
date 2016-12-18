@@ -6,8 +6,7 @@ matrix:
     dist: trusty
     before_install:
       - printenv | grep TRAVIS_
-    after_success:
-    - find . -name "*jar"
+  - os: linux
   - os: osx
 deploy:
   provider: releases
