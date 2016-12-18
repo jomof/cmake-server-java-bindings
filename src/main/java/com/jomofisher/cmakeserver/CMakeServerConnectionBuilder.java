@@ -35,6 +35,9 @@ public class CMakeServerConnectionBuilder {
 
   /**
    * Start the server and return a connection to interact with it.
+   *
+   * @return A connection to the CMake server that can be used to interact with.
+   * @throws IOException if there was a problem spawing the process.
    */
   public CMakeServerConnection create() throws IOException {
     CMakeServerConnection connection = new CMakeServerConnection(this);
