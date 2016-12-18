@@ -16,6 +16,8 @@
 package com.jomofisher.cmakeserver;
 
 import com.jomofisher.cmakeserver.model.HelloMessage;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +27,9 @@ public class CMakeServerConnectionBuilder {
     final private File cmakeInstallPath;
     final private Map<String, String> cmakeProcessEnvironment;
     private boolean allowExtraMessageFields = true;
+    @Nullable
     private ProgressReceiver progressReceiver = null;
+    @Nullable
     private DiagnosticReceiver diagnosticReceiver = null;
 
     public CMakeServerConnectionBuilder(File cmakeInstallPath) {
@@ -37,8 +41,9 @@ public class CMakeServerConnectionBuilder {
      * Start the server and return a connection to interact with it.
      *
      * @return A connection to the CMake server that can be used to interact with.
-     * @throws IOException if there was a problem spawing the process.
+     * @throws IOException if there was a problem spawning the process.
      */
+    @NotNull
     public CMakeServerConnection create() throws IOException {
         CMakeServerConnection connection = new CMakeServerConnection(this);
         HelloMessage reply = connection.connect();
@@ -53,25 +58,30 @@ public class CMakeServerConnectionBuilder {
         return allowExtraMessageFields;
     }
 
+    @NotNull
     public CMakeServerConnectionBuilder setAllowExtraMessageFields(boolean allowExtraMessageFields) {
         this.allowExtraMessageFields = allowExtraMessageFields;
         return this;
     }
 
+    @Nullable
     public ProgressReceiver getProgressReceiver() {
         return progressReceiver;
     }
 
-    public CMakeServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {
+    @NotNull
+    public CMakeServerConnectionBuilder setProgressReceiver(@NotNull ProgressReceiver progressReceiver) {
         this.progressReceiver = progressReceiver;
         return this;
     }
 
+    @Nullable
     public DiagnosticReceiver getDiagnosticReceiver() {
         return diagnosticReceiver;
     }
 
-    public CMakeServerConnectionBuilder setDiagnosticReceiver(DiagnosticReceiver diagnosticReceiver) {
+    @NotNull
+    public CMakeServerConnectionBuilder setDiagnosticReceiver(@NotNull  DiagnosticReceiver diagnosticReceiver) {
         this.diagnosticReceiver = diagnosticReceiver;
         return this;
     }

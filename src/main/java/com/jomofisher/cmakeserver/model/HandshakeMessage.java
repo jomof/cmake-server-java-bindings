@@ -15,6 +15,8 @@
  */
 package com.jomofisher.cmakeserver.model;
 
+import org.jetbrains.annotations.NotNull;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class HandshakeMessage extends BaseMessage {
     public String cookie;
@@ -27,26 +29,31 @@ public class HandshakeMessage extends BaseMessage {
         this.type = "handshake";
     }
 
+    @NotNull
     public HandshakeMessage setProtocolVersion(ProtocolVersion protocolVersion) {
         this.protocolVersion = protocolVersion;
         return this;
     }
 
+    @NotNull
     public HandshakeMessage setCookie(String cookie) {
         this.cookie = cookie;
         return this;
     }
 
+    @NotNull
     public HandshakeMessage setSourceDirectory(String sourceDirectory) {
         this.sourceDirectory = sourceDirectory;
         return this;
     }
 
+    @NotNull
     public HandshakeMessage setBuildDirectory(String buildDirectory) {
         this.buildDirectory = buildDirectory;
         return this;
     }
 
+    @NotNull
     public HandshakeMessage setGenerator(String generator) {
         this.generator = generator;
         return this;

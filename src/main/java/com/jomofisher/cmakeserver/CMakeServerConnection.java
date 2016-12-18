@@ -18,6 +18,8 @@ package com.jomofisher.cmakeserver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jomofisher.cmakeserver.model.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -38,7 +40,7 @@ public class CMakeServerConnection {
         this.builder = builder;
     }
 
-    private void diagnostic(String format, Object... args) {
+    private void diagnostic(@NotNull String format, Object... args) {
         if (builder.getDiagnosticReceiver() != null) {
             builder.getDiagnosticReceiver().receive(String.format(format, args));
         }
@@ -51,7 +53,7 @@ public class CMakeServerConnection {
         return line;
     }
 
-    private void writeLine(String message) throws IOException {
+    private void writeLine(@NotNull String message) throws IOException {
         diagnostic("Writing: %s\n", message);
         output.write(message);
         output.newLine();
@@ -78,14 +80,14 @@ public class CMakeServerConnection {
         return json;
     }
 
-    private void writeMessage(String message) throws IOException {
+    private void writeMessage(@NotNull String message) throws IOException {
         writeLine("[== \"CMake Server\" ==[");
         writeLine(message);
         writeLine("]== \"CMake Server\" ==]");
         output.flush();
     }
 
-    private <T extends BaseMessage> T decodeResponse(Class<T> clazz) throws IOException {
+    private <T extends BaseMessage> T decodeResponse(@NotNull Class<T> clazz) throws IOException {
         Gson gson = new GsonBuilder()
                 .create();
         String message = readMessage();
@@ -141,12 +143,12 @@ public class CMakeServerConnection {
         return decodeResponse(HelloMessage.class);
     }
 
-    private HandshakeReplyMessage handshake(String message) throws IOException {
+    private HandshakeReplyMessage handshake(@NotNull String message) throws IOException {
         writeMessage(message);
         return decodeResponse(HandshakeReplyMessage.class);
     }
 
-    private void checkFolderExists(String path) {
+    private void checkFolderExists(@Nullable String path) {
         if (path == null) {
             throw new RuntimeException("Path was null");
         }
@@ -166,7 +168,7 @@ public class CMakeServerConnection {
         }
     }
 
-    public HandshakeReplyMessage handshake(HandshakeMessage message) throws IOException {
+    public HandshakeReplyMessage handshake(@NotNull HandshakeMessage message) throws IOException {
         checkFolderExists(message.buildDirectory);
         checkFolderExists(message.sourceDirectory);
         writeMessage(new GsonBuilder()
@@ -181,7 +183,7 @@ public class CMakeServerConnection {
         return decodeResponse(GlobalSettingsReplyMessage.class);
     }
 
-    public ConfigureReplyMessage configure(String... cacheArguments) throws IOException {
+    public ConfigureReplyMessage configure(@NotNull String... cacheArguments) throws IOException {
         StringBuilder cacheArgumentBuilder = new StringBuilder();
         for (int i = 0; i < cacheArguments.length; ++i) {
             if (i != 0) {
