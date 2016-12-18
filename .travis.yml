@@ -14,9 +14,9 @@ deploy:
   api_key:
     secure: VMA1ZWxIwakUr0VG0G5z8eZoYszp7d/rfForOzOztT5yiWgqQF99W3EruyceUvKlfGmpczLWGwjLf2+opfEE0TcxA/NxcHkirS08dXahZjF3Rlvaqrg53roN6cmMvhy2e1vspXv9i29dWuKlzMEmtsldz+67PjgxeMze6zJqCU8pSAeicE2XUiEnmP9cU8h+QE5NzGdkIDu+V3hmj5aUXbJtI+AeSv5e0wZvEFLZxCxOtbV67YtRDpIykBNRbrIjXhcRLT1xAR/DPqYLJMb2Gq3SL/cv2BJZ6hdPYNsNW9K1WrqyKfxwIZdoiaSL7L0N4dVkE26Ttzxx4EpZ+ehr4JdV6/E2ige6l/IJccXFw8TomcTxpwFnCHW9vyrMxtJbDVm3qinXj5qsU81Lnr3AW0yqMWnaihU1xaSovNIGXSWX+ass4NqPRhWZ1VBWH1gDTCVrIlXTEbOXUx5rmkpcbhYMS+wyUhdHIfky3yJWL7tv0kaN4Nlydv1qQs78ACChx6zVjKIjEcWfnJLiNG/8+sKFyge3Mql9RNTF05xa+TOiM3G7tg1CzyPaKRfLblOr2BUmYPL8RoL31wkVSlbOfx6+gh5bcv9U50ZtihRJHr04d0ouEqRhLwsTBM7a11nOYI5yHHrP2Tq4e+Zsg+oW/ds9SJPO0RcRqUZ6NpxdbPg=
   file:
-  - build\libs\cmakeserver-${TRAVIS_TAG}.jar
-  - build\libs\cmakeserver-${TRAVIS_TAG}-sources.jar
-  - build\libs\cmakeserver-${TRAVIS_TAG}-javadoc.jar
+  - build/libs/cmakeserver-${TRAVIS_TAG}.jar
+  - build/libs/cmakeserver-${TRAVIS_TAG}-sources.jar
+  - build/libs/cmakeserver-${TRAVIS_TAG}-javadoc.jar
   skip_cleanup: true
   on:
     tags: true
