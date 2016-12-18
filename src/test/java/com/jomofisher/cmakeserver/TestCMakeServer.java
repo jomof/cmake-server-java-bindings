@@ -15,8 +15,16 @@
  */
 package com.jomofisher.cmakeserver;
 
-import com.jomofisher.cmakeserver.model.*;
-import org.jetbrains.annotations.NotNull;
+import com.jomofisher.cmakeserver.model.BaseMessage;
+import com.jomofisher.cmakeserver.model.CodeModelReplyMessage;
+import com.jomofisher.cmakeserver.model.ComputeReplyMessage;
+import com.jomofisher.cmakeserver.model.ConfigureReplyMessage;
+import com.jomofisher.cmakeserver.model.GlobalSettingsReplyMessage;
+import com.jomofisher.cmakeserver.model.HandshakeMessage;
+import com.jomofisher.cmakeserver.model.HandshakeReplyMessage;
+import com.jomofisher.cmakeserver.model.MessageMessage;
+import com.jomofisher.cmakeserver.model.ProgressMessage;
+import com.jomofisher.cmakeserver.model.ProtocolVersion;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -57,7 +65,6 @@ public class TestCMakeServer {
         return new File(".").getAbsoluteFile();
     }
 
-    @NotNull
     private File getCMakeInstallFolder() {
         File workspaceFolder = getWorkspaceFolder();
         switch (detectedOS) {
@@ -72,7 +79,6 @@ public class TestCMakeServer {
         }
     }
 
-    @NotNull
     private File getNinjaInstallFolder() {
         File workspaceFolder = getWorkspaceFolder();
         switch (detectedOS) {
@@ -87,19 +93,18 @@ public class TestCMakeServer {
         }
     }
 
-    @NotNull
     private CMakeServerConnectionBuilder getConnectionBuilder() {
         CMakeServerConnectionBuilder builder = new CMakeServerConnectionBuilder(getCMakeInstallFolder())
                 .setAllowExtraMessageFields(false)
                 .setDiagnosticReceiver(new DiagnosticReceiver() {
                     @Override
-                    public void receive(@NotNull String diagnosticMessage) {
+                    public void receive(String diagnosticMessage) {
                         System.err.printf(diagnosticMessage);
                     }
                 })
                 .setProgressReceiver(new ProgressReceiver() {
                     @Override
-                    public void receive(@NotNull BaseMessage message) {
+                    public void receive(BaseMessage message) {
                         switch (message.type) {
                             case "message":
                                 MessageMessage messageMessage = (MessageMessage) message;
@@ -130,13 +135,11 @@ public class TestCMakeServer {
         return builder;
     }
 
-    @NotNull
     private File getSampleProjectsFolder() {
         File workspaceFolder = getWorkspaceFolder();
         return new File(workspaceFolder, "test-data/cmake-projects/");
     }
 
-    @NotNull
     private HandshakeMessage getHelloWorldHandshake() throws IOException {
         return new HandshakeMessage()
                 .setCookie("my-cookie")

@@ -15,27 +15,22 @@
  */
 package com.jomofisher.cmakeserver.model;
 
-import org.jetbrains.annotations.NotNull;
-
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class ProtocolVersion {
     public Boolean isExperimental;
     public Integer major;
     public Integer minor;
 
-    @NotNull
     public ProtocolVersion setExperimental(boolean experimental) {
         isExperimental = experimental;
         return this;
     }
 
-    @NotNull
     public ProtocolVersion setMajor(int major) {
         this.major = major;
         return this;
     }
 
-    @NotNull
     public ProtocolVersion setMinor(int minor) {
         this.minor = minor;
         return this;

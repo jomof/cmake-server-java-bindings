@@ -20,7 +20,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.jomofisher.cmakeserver.model.BaseMessage;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -29,11 +28,11 @@ import java.util.Map.Entry;
 
 class JsonUtils {
 
-    static <T extends BaseMessage> void checkForExtraFields(@NotNull String message, @NotNull Class<T> clazz) {
+    static <T extends BaseMessage> void checkForExtraFields(String message, Class<T> clazz) {
         checkJsonElementAgainstJava(new JsonParser().parse(message), clazz);
     }
 
-    private static void checkJsonArrayAgainstJava(@NotNull JsonArray array, @NotNull Class clazz) {
+    private static void checkJsonArrayAgainstJava(JsonArray array, Class clazz) {
         Class elementType = clazz.getComponentType();
         if (elementType == null) {
             throw new RuntimeException(String.format("Element type for %s was null", clazz));
@@ -43,7 +42,7 @@ class JsonUtils {
         }
     }
 
-    private static void checkJsonObjectAgainstJava(@NotNull JsonObject jsonObject, @NotNull Class clazz) {
+    private static void checkJsonObjectAgainstJava(JsonObject jsonObject, Class clazz) {
         Map<String, Field> fieldNames = getFieldNames(clazz);
         for (Entry<String, JsonElement> element : jsonObject.entrySet()) {
             Field field = fieldNames.get(element.getKey());
@@ -55,7 +54,7 @@ class JsonUtils {
         }
     }
 
-    private static void checkJsonElementAgainstJava(@NotNull JsonElement element, @NotNull Class clazz) {
+    private static void checkJsonElementAgainstJava(JsonElement element, Class clazz) {
         if (element.isJsonArray()) {
             checkJsonArrayAgainstJava(element.getAsJsonArray(), clazz);
         } else if (element.isJsonObject()) {
@@ -63,8 +62,7 @@ class JsonUtils {
         }
     }
 
-    @NotNull
-    private static Map<String, Field> getFieldNames(@NotNull Class clazz) {
+    private static Map<String, Field> getFieldNames(Class clazz) {
         Map<String, Field> fields = new HashMap<>();
         for (Field field : clazz.getFields()) {
             fields.put(field.getName(), field);
