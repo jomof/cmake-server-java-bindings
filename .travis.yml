@@ -9,7 +9,15 @@ matrix:
       - wget https://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
       - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
   - os: linux
+    before_script:
+      - printenv | grep TRAVIS_
+      - wget https://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
+      - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
   - os: osx
+    before_script:
+      - printenv | grep TRAVIS_
+      - wget https://dl.google.com/android/repository/android-ndk-r13b-darwin-x86_64.zip
+      - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
 deploy:
   provider: releases
   api_key:
