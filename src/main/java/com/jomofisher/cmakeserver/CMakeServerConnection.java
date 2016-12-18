@@ -33,15 +33,21 @@ public class CMakeServerConnection {
     this.builder = builder;
   }
 
+  private void diagnostic(String format, Object... args) {
+    if (builder.getDiagnosticReceiver() != null) {
+      builder.getDiagnosticReceiver().receive(String.format(format, args));
+    }
+  }
+
   private String readLine() throws IOException {
-    System.err.printf("Reading: ");
+    diagnostic("Reading: ");
     String line = input.readLine();
-    System.err.printf(line + "\n");
+    diagnostic(line + "\n");
     return line;
   }
 
   private void writeLine(String message) throws IOException {
-    System.err.printf("Writing: %s\n", message);
+    diagnostic("Writing: %s\n", message);
     output.write(message);
     output.newLine();
   }

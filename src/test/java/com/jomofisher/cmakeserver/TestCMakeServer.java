@@ -87,6 +87,12 @@ public class TestCMakeServer {
     private CMakeServerConnectionBuilder getConnectionBuilder() {
         CMakeServerConnectionBuilder builder = new CMakeServerConnectionBuilder(getCMakeInstallFolder())
                 .setAllowExtraMessageFields(false)
+                .setDiagnosticReceiver(new DiagnosticReceiver() {
+                    @Override
+                    public void receive(String diagnosticMessage) {
+                        System.err.printf(diagnosticMessage);
+                    }
+                })
                 .setProgressReceiver(new ProgressReceiver() {
                     @Override
                     public void receive(BaseMessage message) {
@@ -175,6 +181,27 @@ public class TestCMakeServer {
         CMakeServerConnection connection = getConnectionBuilder().create();
         HandshakeReplyMessage handshakeReply = connection.handshake(getHelloWorldHandshake());
         GlobalSettingsReplyMessage globalSettingsReply = connection.globalSettings();
+    }
+
+    @Test
+    public void testExample() throws Exception {
+        if (false) { // Just make sure it compiles
+            // Usage example
+            CMakeServerConnection connection =
+                    new CMakeServerConnectionBuilder(getCMakeInstallFolder())
+                            .create();
+            connection.handshake(new HandshakeMessage()
+                    .setCookie("my-cookie")
+                    .setGenerator("Ninja")
+                    .setSourceDirectory("./hello-world")
+                    .setBuildDirectory("./hello-world-output")
+                    .setProtocolVersion(new ProtocolVersion()
+                            .setMajor(1)
+                            .setMinor(0)));
+            connection.configure();
+            connection.compute();
+            CodeModelReplyMessage codemodelReply = connection.codemodel();
+        }
     }
 
     enum OSType {

@@ -26,6 +26,7 @@ public class CMakeServerConnectionBuilder {
   final private Map<String, String> cmakeProcessEnvironment;
   private boolean allowExtraMessageFields = true;
   private ProgressReceiver progressReceiver = null;
+  private DiagnosticReceiver diagnosticReceiver = null;
 
   public CMakeServerConnectionBuilder(File cmakeInstallPath) {
     this.cmakeInstallPath = cmakeInstallPath;
@@ -60,6 +61,15 @@ public class CMakeServerConnectionBuilder {
 
   public CMakeServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {
     this.progressReceiver = progressReceiver;
+    return this;
+  }
+
+  public DiagnosticReceiver getDiagnosticReceiver() {
+    return diagnosticReceiver;
+  }
+
+  public CMakeServerConnectionBuilder setDiagnosticReceiver(DiagnosticReceiver diagnosticReceiver) {
+    this.diagnosticReceiver = diagnosticReceiver;
     return this;
   }
 
