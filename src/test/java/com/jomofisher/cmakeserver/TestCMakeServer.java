@@ -66,16 +66,29 @@ public class TestCMakeServer {
     }
 
     private File getCMakeInstallFolder() {
+        String cmakeName = System.getenv().get("TARGET_CMAKE_NAME");
+        if (cmakeName == null) {
+            switch (detectedOS) {
+                case Linux:
+                    cmakeName = "cmake-3.7.1-Linux-x86_64";
+                    break;
+                case Windows:
+                    cmakeName = "cmake-3.7.1-Windows-x86_64";
+                    break;
+                case MacOS:
+                    cmakeName = "cmake-3.7.1-Darwin-x86_64";
+                    break;
+                default:
+                    throw new RuntimeException("OS not yet supported: " + detectedOS);
+            }
+        }
+
         File workspaceFolder = getWorkspaceFolder();
         switch (detectedOS) {
-            case Linux:
-                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Linux-x86_64/bin");
-            case Windows:
-                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Windows-x86_64/bin");
             case MacOS:
-                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Darwin-x86_64/CMake.app/Contents/bin");
+                return new File(workspaceFolder, String.format("prebuilts/%s/CMake.app/Contents/bin", cmakeName));
             default:
-                throw new RuntimeException("OS not yet supported: " + detectedOS);
+                return new File(workspaceFolder, String.format("prebuilts/%s/bin", cmakeName));
         }
     }
 
@@ -201,9 +214,14 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidCodeModel() throws Exception {
-        /*
-        CMakeServerConnection connection = getConnectionBuilder(
-                new File("C:\\Users\\jomof\\projects\\CMake\\bin\\Debug")).create();
+        File cmakePath;
+        if (System.getenv().get("TARGET_CMAKE_NAME") != null) {
+            cmakePath = getCMakeInstallFolder();
+        } else {
+            cmakePath = new File("C:\\Users\\jomof\\projects\\CMake\\bin\\Debug");
+        }
+
+        CMakeServerConnection connection = getConnectionBuilder(cmakePath).create();
         HandshakeReplyMessage handshakeReply = connection.handshake(getAndroidSharedLibHandshake());
         ConfigureReplyMessage configureReply = connection.configure(
                 "-DANDROID_ABI=arm64-v8a",
@@ -216,7 +234,6 @@ public class TestCMakeServer {
                 "-DCMAKE_CXX_FLAGS=");
         ComputeReplyMessage computeReply = connection.compute();
         CodeModelReplyMessage codemodelReply = connection.codemodel();
-        */
     }
 
     @Test
