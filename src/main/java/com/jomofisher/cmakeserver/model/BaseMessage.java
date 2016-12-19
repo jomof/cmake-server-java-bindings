@@ -16,5 +16,13 @@
 package com.jomofisher.cmakeserver.model;
 
 public class BaseMessage {
-    public String type;
+    final public String type;
+
+    BaseMessage() {
+        this.type = null;
+    }
+
+    BaseMessage(String type) {
+        this.type = type;
+    }
 }

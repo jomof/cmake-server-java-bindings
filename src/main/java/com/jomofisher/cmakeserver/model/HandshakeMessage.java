@@ -24,7 +24,7 @@ public class HandshakeMessage extends BaseMessage {
     public String generator;
 
     public HandshakeMessage() {
-        this.type = "handshake";
+        super("handshake");
     }
     
     public HandshakeMessage setProtocolVersion(ProtocolVersion protocolVersion) {

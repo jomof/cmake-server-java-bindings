@@ -18,6 +18,6 @@ package com.jomofisher.cmakeserver.model;
 public class ConfigureMessage extends BaseMessage {
     public String cacheArguments[];
     public ConfigureMessage() {
-        this.type = "configure";
+        super("configure");
     }
 }

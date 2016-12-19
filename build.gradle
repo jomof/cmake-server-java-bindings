@@ -6,11 +6,15 @@ if (System.getenv()["TRAVIS_TAG"] != null) {
 }
 
 apply plugin: 'java'
+apply plugin: 'com.google.protobuf'
 
-sourceCompatibility = 1.7
-
-repositories {
-    mavenCentral()
+buildscript {
+  repositories {
+    mavenLocal()
+  }
+  dependencies {
+    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.1-SNAPSHOT'
+  }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -31,4 +35,7 @@ artifacts {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.2'
+      dependencies {
+    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.0'
+  }
 }

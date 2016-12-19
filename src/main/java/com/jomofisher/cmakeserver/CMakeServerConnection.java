@@ -123,9 +123,6 @@ public class CMakeServerConnection {
     public HelloMessage connect() throws IOException {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").contains("Windows")) {
-            //C:\Users\jomof\projects\CMake\bin\Debug\cmake.exe
-//            processBuilder = new ProcessBuilder("C:\\Users\\jomof\\projects\\CMake\\bin\\Debug\\cmake.exe",
-//                    "-E", "server", "--experimental", "--debug");
             processBuilder = new ProcessBuilder(String.format("%s\\cmake",
                     this.builder.getCmakeInstallPath()),
                     "-E", "server", "--experimental", "--debug");
