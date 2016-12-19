@@ -214,16 +214,7 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidCodeModel() throws Exception {
-        File cmakePath;
-        if (System.getenv().get("TARGET_CMAKE_NAME") != null) {
-            cmakePath = getCMakeInstallFolder();
-        } else {
-            cmakePath = new File("C:\\Users\\jomof\\projects\\CMake\\bin\\Debug");
-        }
-        if (!cmakePath.exists()) {
-            throw new RuntimeException("Path didn't exist " + cmakePath);
-        }
-        CMakeServerConnection connection = getConnectionBuilder(cmakePath).create();
+        CMakeServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
         HandshakeReplyMessage handshakeReply = connection.handshake(getAndroidSharedLibHandshake());
         ConfigureReplyMessage configureReply = connection.configure(
                 "-DANDROID_ABI=arm64-v8a",

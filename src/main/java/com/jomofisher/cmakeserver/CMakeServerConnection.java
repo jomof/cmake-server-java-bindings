@@ -186,7 +186,14 @@ public class CMakeServerConnection {
 
     public ConfigureReplyMessage configure(String... cacheArguments) throws IOException {
         ConfigureMessage message = new ConfigureMessage();
-        message.cacheArguments = cacheArguments;
+
+        // Insert a blank element to work around a bug in CMake 3.7.1 where the first element is ignored.
+        message.cacheArguments = new String[cacheArguments.length + 1];
+        message.cacheArguments[0] = "";
+        for (int i = 0; i < cacheArguments.length; ++i) {
+            message.cacheArguments[i + 1] = cacheArguments[i];
+        }
+
         writeMessage(new GsonBuilder()
                 .setPrettyPrinting()
                 .create()
