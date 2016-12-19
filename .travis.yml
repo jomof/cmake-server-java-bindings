@@ -13,8 +13,7 @@ matrix:
   - os: linux
     before_script:
       - TARGET_CMAKE_NAME=cmake-3.7.20161217-g65aad-Linux-x86_64
-      - wget https://cmake.org/files/dev/$(TARGET_CMAKE_NAME).tar.gz
-      - tar xvfz $(TARGET_CMAKE_NAME).tar.gz -C prebuilts/
+      - ./download_prebuilts
       - wget https://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
       - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
   - os: osx
