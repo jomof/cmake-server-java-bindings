@@ -33,7 +33,7 @@ matrix:
       - unzip android-ndk-r13b-darwin-x86_64.zip -d prebuilts/ > nul
     script:
       - ./gradlew assemble check --stacktrace
-      
+
 deploy:
   provider: releases
   api_key:

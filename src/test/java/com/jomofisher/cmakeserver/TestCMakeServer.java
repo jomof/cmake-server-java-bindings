@@ -220,7 +220,9 @@ public class TestCMakeServer {
         } else {
             cmakePath = new File("C:\\Users\\jomof\\projects\\CMake\\bin\\Debug");
         }
-
+        if (!cmakePath.exists()) {
+            throw new RuntimeException("Path didn't exist " + cmakePath);
+        }
         CMakeServerConnection connection = getConnectionBuilder(cmakePath).create();
         HandshakeReplyMessage handshakeReply = connection.handshake(getAndroidSharedLibHandshake());
         ConfigureReplyMessage configureReply = connection.configure(
