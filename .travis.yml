@@ -12,6 +12,7 @@ matrix:
       - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
     script:
       - ./gradlew assemble check --stacktrace
+
   - os: linux
     before_script:
       - TARGET_CMAKE_NAME=cmake-3.7.20161217-g65aad-Linux-x86_64
@@ -21,6 +22,7 @@ matrix:
       - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
     script:
       - ./gradlew assemble check --stacktrace
+
   - os: osx
     before_script:
       - TARGET_CMAKE_NAME=cmake-3.7.20161217-g65aad-Darwin-x86_64
@@ -31,6 +33,7 @@ matrix:
       - unzip android-ndk-r13b-darwin-x86_64.zip -d prebuilts/ > nul
     script:
       - ./gradlew assemble check --stacktrace
+      
 deploy:
   provider: releases
   api_key:
