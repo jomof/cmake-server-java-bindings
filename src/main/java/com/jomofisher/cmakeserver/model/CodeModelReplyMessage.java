@@ -18,44 +18,66 @@ package com.jomofisher.cmakeserver.model;
 
 /**
  * Example,
- * <p>
- * {
- * "configurations":[
- * {
- * "name":"",
- * "projects":[
- * {
- * "buildDirectory":"/tmp",
- * "name":"hello",
- * "sourceDirectory":"/usr/local/google/home/jomof/projects/cmake-server-java-bindings/test-data/cmake-projects/hello-world",
- * "targets":[
- * {
- * "artifacts":["/tmp/hello"],
- * "buildDirectory":"/tmp",
- * "fileGroups":[
- * {
- * "compileFlags":" ",
- * "isGenerated":false,
- * "language":"CXX",
- * "sources":["hello.cpp"]
- * }
- * ],
- * "fullName":"hello",
- * "linkLibraries":"-rdynamic",
- * "linkerLanguage":"CXX",
- * "name":"hello",
- * "sourceDirectory":"/usr/local/google/home/jomof/projects/cmake-server-java-bindings/test-data/cmake-projects/hello-world",
- * "type":"EXECUTABLE"
- * }
- * ]
- * }
- * ]
- * }
- * ],
- * "cookie":"",
- * "inReplyTo":"codemodel",
- * "type":"reply"
- * }
+{
+   "configurations":[
+      {
+         "name":"Debug",
+         "projects":[
+            {
+               "buildDirectory":"C:/Users/jomof/projects/cmakeserver/test-output/cmake-bindings-test132256646897976579",
+               "name":"Project",
+               "sourceDirectory":"C:/Users/jomof/projects/cmakeserver/test-data/cmake-projects/android-shared-lib",
+               "targets":[
+                  {
+                     "artifacts":[
+                        "C:/Users/jomof/projects/cmakeserver/test-output/cmake-bindings-test132256646897976579/libnative-lib.so"
+                     ],
+                     "buildDirectory":"C:/Users/jomof/projects/cmakeserver/test-output/cmake-bindings-test132256646897976579",
+                     "fileGroups":[
+                        {
+                           "compileFlags":"-g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror=format-security -fno-exceptions -fno-rtti  -O0 -O0  -fPIC  ",
+                           "defines":[
+                              "native_lib_EXPORTS"
+                           ],
+                           "includePath":[
+                              {
+                                 "isSystem":true,
+                                 "path":"C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/include"
+                              },
+                              {
+                                 "isSystem":true,
+                                 "path":"C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/include"
+                              },
+                              {
+                                 "isSystem":true,
+                                 "path":"C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/include/backward"
+                              }
+                           ],
+                           "isGenerated":false,
+                           "language":"CXX",
+                           "sources":[
+                              "src/main/cpp/native-lib.cpp"
+                           ]
+                        }
+                     ],
+                     "fullName":"libnative-lib.so",
+                     "linkFlags":"-Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now",
+                     "linkLibraries":"-llog -lm \"C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/libgnustl_static.a\"",
+                     "linkerLanguage":"CXX",
+                     "name":"native-lib",
+                     "sourceDirectory":"C:/Users/jomof/projects/cmakeserver/test-data/cmake-projects/android-shared-lib",
+                     "sysroot":"C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/platforms/android-21/arch-arm64",
+                     "type":"SHARED_LIBRARY"
+                  }
+               ]
+            }
+         ]
+      }
+   ],
+   "cookie":"",
+   "inReplyTo":"codemodel",
+   "type":"reply"
+}
  */
 @SuppressWarnings("unused")
 public class CodeModelReplyMessage extends BaseMessage {

@@ -21,4 +21,6 @@ public class FileGroup {
     public boolean isGenerated;
     public String language;
     public String sources[];
+    public String defines[];
+    public IncludePath includePath[];
 }

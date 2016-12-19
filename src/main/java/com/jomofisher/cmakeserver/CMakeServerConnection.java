@@ -52,7 +52,7 @@ public class CMakeServerConnection {
     }
 
     private void writeLine(String message) throws IOException {
-        diagnostic("Writing: %s\n", message);
+        diagnostic("%s\n", message);
         output.write(message);
         output.newLine();
     }
@@ -123,11 +123,14 @@ public class CMakeServerConnection {
     public HelloMessage connect() throws IOException {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").contains("Windows")) {
-            processBuilder = new ProcessBuilder(String.format("%s\\bin\\cmake",
+            //C:\Users\jomof\projects\CMake\bin\Debug\cmake.exe
+//            processBuilder = new ProcessBuilder("C:\\Users\\jomof\\projects\\CMake\\bin\\Debug\\cmake.exe",
+//                    "-E", "server", "--experimental", "--debug");
+            processBuilder = new ProcessBuilder(String.format("%s\\cmake",
                     this.builder.getCmakeInstallPath()),
                     "-E", "server", "--experimental", "--debug");
         } else {
-            processBuilder = new ProcessBuilder(String.format("%s/bin/cmake",
+            processBuilder = new ProcessBuilder(String.format("%s/cmake",
                     this.builder.getCmakeInstallPath()),
                     "-E", "server", "--experimental", "--debug");
         }
@@ -182,15 +185,12 @@ public class CMakeServerConnection {
     }
 
     public ConfigureReplyMessage configure(String... cacheArguments) throws IOException {
-        StringBuilder cacheArgumentBuilder = new StringBuilder();
-        for (int i = 0; i < cacheArguments.length; ++i) {
-            if (i != 0) {
-                cacheArgumentBuilder.append(", ");
-            }
-            cacheArgumentBuilder.append(String.format("\"%s\"", cacheArguments[i]));
-        }
-        writeMessage("{\"type\":\"configure\", \"cacheArguments\":["
-                + cacheArgumentBuilder.toString() + "]}");
+        ConfigureMessage message = new ConfigureMessage();
+        message.cacheArguments = cacheArguments;
+        writeMessage(new GsonBuilder()
+                .setPrettyPrinting()
+                .create()
+                .toJson(message));
         return decodeResponse(ConfigureReplyMessage.class);
     }
 

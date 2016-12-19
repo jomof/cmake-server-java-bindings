@@ -69,11 +69,11 @@ public class TestCMakeServer {
         File workspaceFolder = getWorkspaceFolder();
         switch (detectedOS) {
             case Linux:
-                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Linux-x86_64");
+                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Linux-x86_64/bin");
             case Windows:
-                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Windows-x86_64");
+                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Windows-x86_64/bin");
             case MacOS:
-                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Darwin-x86_64/CMake.app/Contents");
+                return new File(workspaceFolder, "prebuilts/cmake-3.7.1-Darwin-x86_64/CMake.app/Contents/bin");
             default:
                 throw new RuntimeException("OS not yet supported: " + detectedOS);
         }
@@ -94,7 +94,10 @@ public class TestCMakeServer {
     }
 
     private CMakeServerConnectionBuilder getConnectionBuilder() {
-        CMakeServerConnectionBuilder builder = new CMakeServerConnectionBuilder(getCMakeInstallFolder())
+        return getConnectionBuilder(getCMakeInstallFolder());
+    }
+    private CMakeServerConnectionBuilder getConnectionBuilder(File cmakeInstallFolder) {
+        CMakeServerConnectionBuilder builder = new CMakeServerConnectionBuilder(cmakeInstallFolder)
                 .setAllowExtraMessageFields(false)
                 .setDiagnosticReceiver(new DiagnosticReceiver() {
                     @Override
@@ -112,8 +115,8 @@ public class TestCMakeServer {
                                 break;
                             case "progress":
                                 ProgressMessage progressMessage = (ProgressMessage) message;
-                                System.err.printf("Progress: %s of %s\n", progressMessage.progressCurrent,
-                                        progressMessage.progressMaximum);
+//                                System.err.printf("Progress: %s of %s\n", progressMessage.progressCurrent,
+//                                        progressMessage.progressMaximum);
                                 break;
                             default:
                                 throw new RuntimeException("Unexpected message type: " + message.type);
@@ -145,6 +148,17 @@ public class TestCMakeServer {
                 .setCookie("my-cookie")
                 .setGenerator("Ninja")
                 .setSourceDirectory(new File(getSampleProjectsFolder(), "hello-world").getAbsolutePath().replace('\\', '/'))
+                .setBuildDirectory(getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/'))
+                .setProtocolVersion(new ProtocolVersion()
+                        .setMajor(1));
+    }
+
+    private HandshakeMessage getAndroidSharedLibHandshake() throws IOException {
+        return new HandshakeMessage()
+                .setCookie("my-cookie")
+                .setGenerator("Ninja")
+                .setSourceDirectory(new File(getSampleProjectsFolder(), "android-shared-lib")
+                        .getAbsolutePath().replace('\\', '/'))
                 .setBuildDirectory(getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/'))
                 .setProtocolVersion(new ProtocolVersion()
                         .setMajor(1));
@@ -183,6 +197,26 @@ public class TestCMakeServer {
         ConfigureReplyMessage configureReply = connection.configure();
         ComputeReplyMessage computeReply = connection.compute();
         CodeModelReplyMessage codemodelReply = connection.codemodel();
+    }
+
+    @Test
+    public void testAndroidCodeModel() throws Exception {
+        /*
+        CMakeServerConnection connection = getConnectionBuilder(
+                new File("C:\\Users\\jomof\\projects\\CMake\\bin\\Debug")).create();
+        HandshakeReplyMessage handshakeReply = connection.handshake(getAndroidSharedLibHandshake());
+        ConfigureReplyMessage configureReply = connection.configure(
+                "-DANDROID_ABI=arm64-v8a",
+                "-DANDROID_NDK=prebuilts\\android-ndk-r13b",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                String.format("-DCMAKE_TOOLCHAIN_FILE=%s\\prebuilts\\android-ndk-r13b\\build\\cmake\\android.toolchain.cmake",
+                        new File(".").getAbsolutePath()),
+                "-DANDROID_NATIVE_API_LEVEL=21",
+                "-DANDROID_TOOLCHAIN=gcc",
+                "-DCMAKE_CXX_FLAGS=");
+        ComputeReplyMessage computeReply = connection.compute();
+        CodeModelReplyMessage codemodelReply = connection.codemodel();
+        */
     }
 
     @Test
