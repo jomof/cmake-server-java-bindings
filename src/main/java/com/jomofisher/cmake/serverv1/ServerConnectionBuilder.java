@@ -40,7 +40,7 @@ public class ServerConnectionBuilder {
      */
     public ServerConnection create() throws IOException {
         ServerConnection connection = new ServerConnection(this);
-        HelloResult reply = connection.connect();
+        connection.connect();
         return connection;
     }
 

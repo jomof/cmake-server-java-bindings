@@ -20,13 +20,11 @@ public class InteractiveMessage {
     final public String cookie;
     final public String inReplyTo;
     final public String message;
-    final public String title;
 
     private InteractiveMessage() {
         this.type = null;
         this.cookie = null;
         this.inReplyTo = null;
         this.message = null;
-        this.title = null;
     }
 }

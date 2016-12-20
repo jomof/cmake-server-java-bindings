@@ -19,8 +19,6 @@ public class InteractiveProgress {
     final public String type;
     final public String cookie;
     final public String inReplyTo;
-    final public String message;
-    final public String title;
     final public Integer progressCurrent;
     final public Integer progressMaximum;
     final public String progressMessage;
@@ -30,8 +28,6 @@ public class InteractiveProgress {
         this.type = null;
         this.cookie = null;
         this.inReplyTo = null;
-        this.message = null;
-        this.title = null;
         this.progressCurrent = null;
         this.progressMaximum = null;
         this.progressMessage = null;

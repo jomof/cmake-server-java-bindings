@@ -134,12 +134,23 @@ public class TestCMakeServer {
                     @Override
                     public void receive(InteractiveMessage message) {
                         System.err.printf("Message: %s\n", message.message);
+                        assertThat(message.cookie).isNotNull();
+                        assertThat(message.inReplyTo).isNotNull();
+                        assertThat(message.message).isNotNull();
+                        assertThat(message.type).isNotNull();
                     }
                 })
                 .setProgressReceiver(new ProgressReceiver() {
                     @Override
                     public void receive(InteractiveProgress progress) {
                         System.err.printf("Progress: %s of %s\n", progress.progressCurrent, progress.progressMaximum);
+                        assertThat(progress.cookie).isNotNull();
+                        assertThat(progress.inReplyTo).isNotNull();
+                        assertThat(progress.progressMinimum).isNotNull();
+                        assertThat(progress.progressCurrent).isNotNull();
+                        assertThat(progress.progressMaximum).isNotNull();
+                        assertThat(progress.progressMessage).isNotNull();
+                        assertThat(progress.type).isNotNull();
                     }
                 });
     }
@@ -213,8 +224,22 @@ public class TestCMakeServer {
     @Test
     public void testAndroidCodeModel() throws Exception {
         ServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
+        HelloResult helloResult = connection.getConnectionHelloResult();
+
+        assertThat(helloResult.type).isNotNull();
+        assertThat(helloResult.supportedProtocolVersions).isNotNull();
+        assertThat(helloResult.supportedProtocolVersions).isNotEmpty();
+        assertThat(helloResult.supportedProtocolVersions[0].isExperimental).isNotNull();
+        assertThat(helloResult.supportedProtocolVersions[0].major).isNotNull();
+        assertThat(helloResult.supportedProtocolVersions[0].minor).isNotNull();
+
         HandshakeResult handshakeResult = connection.handshake(getAndroidSharedLibHandshake());
-        connection.configure(
+
+        assertThat(handshakeResult.cookie).isNotNull();
+        assertThat(handshakeResult.inReplyTo).isNotNull();
+        assertThat(handshakeResult.type).isNotNull();
+
+        ConfigureResult configureResult = connection.configure(
                 "-DANDROID_ABI=arm64-v8a",
                 "-DANDROID_NDK=prebuilts\\android-ndk-r13b",
                 "-DCMAKE_BUILD_TYPE=Debug",
@@ -223,9 +248,85 @@ public class TestCMakeServer {
                 "-DANDROID_NATIVE_API_LEVEL=21",
                 "-DANDROID_TOOLCHAIN=gcc",
                 "-DCMAKE_CXX_FLAGS=");
+
+        assertThat(configureResult.cookie).isNotNull();
+        assertThat(configureResult.inReplyTo).isNotNull();
+        assertThat(configureResult.type).isNotNull();
+
         ComputeResult computeResult = connection.compute();
+
+        assertThat(computeResult.cookie).isNotNull();
+        assertThat(computeResult.inReplyTo).isNotNull();
+        assertThat(computeResult.type).isNotNull();
+
         CodeModel codemodelReply = connection.codemodel();
+
+        assertThat(codemodelReply.type).isNotNull();
+        assertThat(codemodelReply.configurations).isNotNull();
+        assertThat(codemodelReply.cookie).isNotNull();
+        assertThat(codemodelReply.inReplyTo).isNotNull();
+        assertThat(codemodelReply.configurations).isNotEmpty();
+        assertThat(codemodelReply.configurations[0].name).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects).isNotEmpty();
+        assertThat(codemodelReply.configurations[0].projects[0].buildDirectory).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].name).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].sourceDirectory).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets).isNotEmpty();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].artifacts).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].buildDirectory).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].linkerLanguage).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fullName).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].sysroot).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].type).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].linkFlags).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].sourceDirectory).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].linkLibraries).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].name).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups).isNotEmpty();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].compileFlags).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].defines).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].isGenerated).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].language).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].sources).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].includePath).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].includePath).isNotEmpty();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].includePath[0].isSystem).isNotNull();
+        assertThat(codemodelReply.configurations[0].projects[0].targets[0].fileGroups[0].includePath[0].path).isNotNull();
+
         GlobalSettings globalSettings = connection.globalSettings();
+        assertThat(globalSettings).isNotNull();
+        assertThat(globalSettings.type).isNotNull();
+        assertThat(globalSettings.cookie).isNotNull();
+        assertThat(globalSettings.inReplyTo).isNotNull();
+        assertThat(globalSettings.buildDirectory).isNotNull();
+        assertThat(globalSettings.checkSystemVars).isNotNull();
+        assertThat(globalSettings.debugOutput).isNotNull();
+        assertThat(globalSettings.extraGenerator).isNotNull();
+        assertThat(globalSettings.generator).isNotNull();
+        assertThat(globalSettings.sourceDirectory).isNotNull();
+        assertThat(globalSettings.trace).isNotNull();
+        assertThat(globalSettings.traceExpand).isNotNull();
+        assertThat(globalSettings.warnUninitialized).isNotNull();
+        assertThat(globalSettings.warnUnused).isNotNull();
+        assertThat(globalSettings.warnUnusedCli).isNotNull();
+        assertThat(globalSettings.capabilities).isNotNull();
+        assertThat(globalSettings.capabilities.serverMode).isNotNull();
+        assertThat(globalSettings.capabilities.version).isNotNull();
+        assertThat(globalSettings.capabilities.generators).isNotNull();
+        assertThat(globalSettings.capabilities.generators).isNotEmpty();
+        assertThat(globalSettings.capabilities.generators[0].extraGenerators).isNotNull();
+        assertThat(globalSettings.capabilities.generators[0].name).isNotNull();
+        assertThat(globalSettings.capabilities.generators[0].platformSupport).isNotNull();
+        assertThat(globalSettings.capabilities.generators[0].toolsetSupport).isNotNull();
+        assertThat(globalSettings.capabilities.version.isDirty).isNotNull();
+        assertThat(globalSettings.capabilities.version.major).isNotNull();
+        assertThat(globalSettings.capabilities.version.minor).isNotNull();
+        assertThat(globalSettings.capabilities.version.patch).isNotNull();
+        assertThat(globalSettings.capabilities.version.string).isNotNull();
+        assertThat(globalSettings.capabilities.version.suffix).isNotNull();
     }
 
     @Test
@@ -238,6 +339,7 @@ public class TestCMakeServer {
 
     @Test
     public void testExample() throws Exception {
+        //noinspection ConstantConditions
         if (false) { // Just make sure it compiles
             // Usage example
             ServerConnection connection = new CMake(getCMakeInstallFolder())

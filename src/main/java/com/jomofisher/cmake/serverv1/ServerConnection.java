@@ -24,6 +24,7 @@ public class ServerConnection {
     private final ServerConnectionBuilder builder;
     private BufferedReader input;
     private BufferedWriter output;
+    private HelloResult helloResult;
 
     ServerConnection(ServerConnectionBuilder builder) {
         this.builder = builder;
@@ -113,7 +114,11 @@ public class ServerConnection {
         }
     }
 
-    public HelloResult connect() throws IOException {
+    public HelloResult getConnectionHelloResult() {
+        return this.helloResult;
+    }
+
+    public void connect() throws IOException {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").contains("Windows")) {
             processBuilder = new ProcessBuilder(String.format("%s\\cmake",
@@ -131,7 +136,7 @@ public class ServerConnection {
         input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-        return decodeResponse(HelloResult.class);
+        helloResult = decodeResponse(HelloResult.class);
     }
 
     public HandshakeResult handshake(HandshakeRequest message) throws IOException {
