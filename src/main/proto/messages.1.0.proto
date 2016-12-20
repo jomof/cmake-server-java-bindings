@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+option java_package = "com.jomofisher.cmakeserver.model";
+option java_multiple_files = true;
+
+message TypeOfMessage {
+    string type = 1;
+}
+
+message ConfigureReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+}
+
+message GlobalSettingsReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+    string buildDirectory = 4;
+    bool checkSystemVars = 5;
+    bool debugOutput = 6;
+    string extraGenerator = 7;
+    string generator = 8;
+    string sourceDirectory = 9;
+    bool trace = 10;
+    bool traceExpand = 11;
+    bool warnUninitialized = 12;
+    bool warnUnused = 13;
+    bool warnUnusedCli = 14;
+    Capabilities capabilities = 15;
+}
+
+message Capabilities {
+    repeated Generator generators = 1;
+    bool serverMode = 2;
+    Version version = 3;
+}
+
+message Generator {
+    string name = 1;
+    bool platformSupport = 2;
+    bool toolsetSupport = 3;
+    repeated string extraGenerators = 4;
+}
+
+message Version {
+    bool isDirty = 1;
+    int32 major = 2;
+    int32 minor = 3;
+    int32 patch = 4;
+    string string = 5;
+    string suffix = 6;
+}
+
+message HandshakeReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+}
+
+message HandshakeMessage {
+    string type = 1 [default = "handshake"];
+    string cookie = 2;
+    ProtocolVersion protocolVersion = 3;
+    string sourceDirectory = 4;
+    string buildDirectory = 5;
+    string generator = 6;
+}
+
+message ProtocolVersion {
+    bool isExperimental = 1;
+    int32 major = 2;
+    int32 minor = 3;
+}
+
+message CodeModelReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+    repeated Configuration configurations = 4;
+}
+
+message Configuration {
+    string name = 1;
+    repeated Project projects = 2;
+}
+
+message Project {
+    string buildDirectory = 1;
+    string name = 2;
+    string sourceDirectory = 3;
+    repeated Target targets = 4;
+}
+
+message Target {
+    repeated string artifacts = 1;
+    string buildDirectory = 2;
+    repeated FileGroup fileGroups = 3;
+    string fullName = 4;
+    string linkLibraries = 5;
+    string linkerLanguage = 6;
+    string name = 7;
+    string sourceDirectory = 8;
+    string type = 9;
+    string linkFlags = 10;
+    string sysroot = 11;
+}
+
+message FileGroup {
+    string compileFlags = 1;
+    bool isGenerated = 2;
+    string language = 3;
+    repeated string sources = 4;
+    repeated string defines = 5;
+    repeated IncludePath includePath = 6;
+}
+
+message IncludePath {
+    bool isSystem = 1;
+    string path = 2;
+}
+
+message ComputeReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+}
+
+message HelloReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+}
+
+message MessageReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+    string message = 4;
+    string title = 5;
+}
+
+message ProgressReply {
+    string type = 1;
+    string cookie = 2;
+    string inReplyTo = 3;
+    string message = 4;
+    string title = 5;
+    int32 progressCurrent = 6;
+    int32 progressMaximum = 7;
+    string progressMessage = 8;
+    int32 progressMinimum = 9;
+}
+
+message ConfigureMessage {
+    string type = 1;
+    repeated string cacheArguments = 2;
+}
+

@@ -15,12 +15,14 @@
  */
 package com.jomofisher.cmakeserver;
 
-import com.jomofisher.cmakeserver.model.BaseMessage;
+import com.jomofisher.cmakeserver.model.MessageReply;
+import com.jomofisher.cmakeserver.model.ProgressReply;
 
 /**
  * Handles messages received interactively during configure, etc.
  * BaseMessage types: "message", "progress"
  */
 public interface ProgressReceiver {
-    void receive(BaseMessage baseMessage);
+    void receiveMessage(MessageReply message);
+    void receiveProgress(ProgressReply progress);
 }

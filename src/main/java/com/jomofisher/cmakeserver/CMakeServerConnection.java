@@ -17,14 +17,10 @@ package com.jomofisher.cmakeserver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.protobuf.GeneratedMessageV3;
 import com.jomofisher.cmakeserver.model.*;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.*;
 
 import static com.jomofisher.cmakeserver.JsonUtils.checkForExtraFields;
 
@@ -85,30 +81,33 @@ public class CMakeServerConnection {
         output.flush();
     }
 
-    private <T extends BaseMessage> T decodeResponse(Class<T> clazz) throws IOException {
-        Gson gson = new GsonBuilder()
+    private <T> T decodeResponse(Class<T> clazz) throws IOException {
+        Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(
+                GeneratedMessageV3.class, ProtoTypeAdapter.newBuilder()
+                        .setEnumSerialization(ProtoTypeAdapter.EnumSerialization.NUMBER)
+                        .build())
                 .create();
         String message = readMessage();
-        BaseMessage messageType = gson.fromJson(message, BaseMessage.class);
+        String messageType = gson.fromJson(message, TypeOfMessage.class).getType();
 
         // Process interactive messages.
-        while (messageType.type.equals("message") || messageType.type.equals("progress")) {
+        while (messageType.equals("message") || messageType.equals("progress")) {
             if (builder.getProgressReceiver() != null) {
-                switch (messageType.type) {
+                switch (messageType) {
                     case "message":
-                        builder.getProgressReceiver().receive(gson.fromJson(message, MessageMessage.class));
+                        builder.getProgressReceiver().receiveMessage(gson.fromJson(message, MessageReply.class));
                         break;
                     case "progress":
-                        builder.getProgressReceiver().receive(gson.fromJson(message, ProgressMessage.class));
+                        builder.getProgressReceiver().receiveProgress(gson.fromJson(message, ProgressReply.class));
                         break;
                 }
             }
             message = readMessage();
-            messageType = gson.fromJson(message, BaseMessage.class);
+            messageType = gson.fromJson(message, TypeOfMessage.class).getType();
         }
 
         // Process the final message.
-        switch (messageType.type) {
+        switch (messageType) {
             case "hello":
             case "reply":
                 if (!builder.getAllowExtraMessageFields()) {
@@ -120,7 +119,7 @@ public class CMakeServerConnection {
         }
     }
 
-    public HelloMessage connect() throws IOException {
+    public HelloReply connect() throws IOException {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").contains("Windows")) {
             processBuilder = new ProcessBuilder(String.format("%s\\cmake",
@@ -138,12 +137,12 @@ public class CMakeServerConnection {
         input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-        return decodeResponse(HelloMessage.class);
+        return decodeResponse(HelloReply.class);
     }
 
-    private HandshakeReplyMessage handshake(String message) throws IOException {
+    private HandshakeReply handshake(String message) throws IOException {
         writeMessage(message);
-        return decodeResponse(HandshakeReplyMessage.class);
+        return decodeResponse(HandshakeReply.class);
     }
 
     private void checkFolderExists(String path) {
@@ -166,46 +165,39 @@ public class CMakeServerConnection {
         }
     }
 
-    public HandshakeReplyMessage handshake(HandshakeMessage message) throws IOException {
-        checkFolderExists(message.buildDirectory);
-        checkFolderExists(message.sourceDirectory);
-        writeMessage(new GsonBuilder()
-                .setPrettyPrinting()
-                .create()
-                .toJson(message));
-        return decodeResponse(HandshakeReplyMessage.class);
+    public HandshakeReply handshake(HandshakeMessage message) throws IOException {
+        checkFolderExists(message.getBuildDirectory());
+        checkFolderExists(message.getSourceDirectory());
+        writeMessage(JsonFormat.printer().print(message.toBuilder().setType("handshake")));
+        return decodeResponse(HandshakeReply.class);
     }
 
-    public GlobalSettingsReplyMessage globalSettings() throws IOException {
+    public GlobalSettingsReply globalSettings() throws IOException {
         writeMessage("{\"type\":\"globalSettings\"}");
-        return decodeResponse(GlobalSettingsReplyMessage.class);
+        return decodeResponse(GlobalSettingsReply.class);
     }
 
-    public ConfigureReplyMessage configure(String... cacheArguments) throws IOException {
-        ConfigureMessage message = new ConfigureMessage();
+    public ConfigureReply configure(String... cacheArguments) throws IOException {
+        ConfigureMessage.Builder message = ConfigureMessage.newBuilder();
 
         // Insert a blank element to work around a bug in CMake 3.7.1 where the first element is ignored.
-        message.cacheArguments = new String[cacheArguments.length + 1];
-        message.cacheArguments[0] = "";
-        for (int i = 0; i < cacheArguments.length; ++i) {
-            message.cacheArguments[i + 1] = cacheArguments[i];
+        message.addCacheArguments("");
+        for (String cacheArgument : cacheArguments) {
+            message.addCacheArguments(cacheArgument);
         }
 
-        writeMessage(new GsonBuilder()
-                .setPrettyPrinting()
-                .create()
-                .toJson(message));
-        return decodeResponse(ConfigureReplyMessage.class);
+        writeMessage(JsonFormat.printer().print(message.setType("configure")));
+        return decodeResponse(ConfigureReply.class);
     }
 
-    public ComputeReplyMessage compute() throws IOException {
+    public ComputeReply compute() throws IOException {
         writeMessage("{\"type\":\"compute\"}");
-        return decodeResponse(ComputeReplyMessage.class);
+        return decodeResponse(ComputeReply.class);
     }
 
-    public CodeModelReplyMessage codemodel() throws IOException {
+    public CodeModelReply codemodel() throws IOException {
         writeMessage("{\"type\":\"codemodel\"}");
-        return decodeResponse(CodeModelReplyMessage.class);
+        return decodeResponse(CodeModelReply.class);
     }
 }
 

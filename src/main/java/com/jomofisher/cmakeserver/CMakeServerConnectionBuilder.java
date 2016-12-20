@@ -15,7 +15,7 @@
  */
 package com.jomofisher.cmakeserver;
 
-import com.jomofisher.cmakeserver.model.HelloMessage;
+import com.jomofisher.cmakeserver.model.HelloReply;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class CMakeServerConnectionBuilder {
      */
     public CMakeServerConnection create() throws IOException {
         CMakeServerConnection connection = new CMakeServerConnection(this);
-        HelloMessage reply = connection.connect();
+        HelloReply reply = connection.connect();
         return connection;
     }
 
