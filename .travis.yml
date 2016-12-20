@@ -1,6 +1,6 @@
 language: java
 jdk:
-  -Oracle JDK 8
+  - oraclejdk8
 sudo: false
 matrix:
   include:
