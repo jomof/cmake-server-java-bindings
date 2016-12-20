@@ -15,8 +15,8 @@
  */
 package com.jomofisher.cmakeserver;
 
-import com.jomofisher.cmakeserver.model.MessageReply;
-import com.jomofisher.cmakeserver.model.ProgressReply;
+import com.jomofisher.cmakeserver.modelv1.MessageReply;
+import com.jomofisher.cmakeserver.modelv1.ProgressReply;
 
 /**
  * Handles messages received interactively during configure, etc.

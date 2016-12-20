@@ -6,17 +6,17 @@ Creates java bindings for CMake Server. Example usage,
             CMakeServerConnection connection =
                     new CMakeServerConnectionBuilder(getCMakeInstallFolder())
                             .create();
-            connection.handshake(new HandshakeMessage()
-                    .setCookie("my-cookie")
-                    .setGenerator("Ninja")
-                    .setSourceDirectory("./hello-world")
-                    .setBuildDirectory("./hello-world-output")
-                    .setProtocolVersion(new ProtocolVersion()
-                            .setMajor(1)
-                            .setMinor(0)));
+            HandshakeMessage message = new HandshakeMessage();
+            message.cookie = "my-cookie";
+            message.generator = "Ninja";
+            message.sourceDirectory = "./hello-world";
+            message.buildDirectory = "./hello-world-output";
+            ProtocolVersion version = new ProtocolVersion();
+            version.major = 1;
+            message.protocolVersion = version;
             connection.configure();
             connection.compute();
-            CodeModelReplyMessage codemodelReply = connection.codemodel();
+            CodeModelReply codemodelReply = connection.codemodel();
 
 [Download cmakeserver-1.0-alpha1.jar] (https://github.com/jomof/cmake-server-java-bindings/releases/tag/cmakeserver-1.0-alpha1)
 

@@ -34,7 +34,7 @@ class JsonUtils {
     private static void checkJsonArrayAgainstJava(JsonArray array, Class clazz) {
         Class elementType = clazz.getComponentType();
         if (elementType == null) {
-            throw new RuntimeException(String.format("Element type for %s was null", clazz));
+            throw new RuntimeException(String.format("Element type for %s with json array %s was null", clazz, array));
         }
         for (JsonElement arrayElement : array) {
             checkJsonElementAgainstJava(arrayElement, elementType);

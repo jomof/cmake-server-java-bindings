@@ -17,8 +17,7 @@ package com.jomofisher.cmakeserver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.protobuf.GeneratedMessageV3;
-import com.jomofisher.cmakeserver.model.*;
+import com.jomofisher.cmakeserver.modelv1.*;
 
 import java.io.*;
 
@@ -82,13 +81,10 @@ public class CMakeServerConnection {
     }
 
     private <T> T decodeResponse(Class<T> clazz) throws IOException {
-        Gson gson = new GsonBuilder().registerTypeHierarchyAdapter(
-                GeneratedMessageV3.class, ProtoTypeAdapter.newBuilder()
-                        .setEnumSerialization(ProtoTypeAdapter.EnumSerialization.NUMBER)
-                        .build())
+        Gson gson = new GsonBuilder()
                 .create();
         String message = readMessage();
-        String messageType = gson.fromJson(message, TypeOfMessage.class).getType();
+        String messageType = gson.fromJson(message, TypeOfMessage.class).type;
 
         // Process interactive messages.
         while (messageType.equals("message") || messageType.equals("progress")) {
@@ -103,7 +99,7 @@ public class CMakeServerConnection {
                 }
             }
             message = readMessage();
-            messageType = gson.fromJson(message, TypeOfMessage.class).getType();
+            messageType = gson.fromJson(message, TypeOfMessage.class).type;
         }
 
         // Process the final message.
@@ -145,30 +141,11 @@ public class CMakeServerConnection {
         return decodeResponse(HandshakeReply.class);
     }
 
-    private void checkFolderExists(String path) {
-        if (path == null) {
-            throw new RuntimeException("Path was null");
-        }
-        File directory = new File(path);
-        if (!directory.isDirectory()) {
-            File parent = directory;
-            while (parent != null && !parent.isDirectory()) {
-                parent = parent.getParentFile();
-            }
-            if (parent == null) {
-                throw new RuntimeException(String.format(
-                        "Folder %s didn't exist and neither did any parent folders", directory));
-            }
-            throw new RuntimeException(String.format(
-                    "Folder %s didn't exist. Nearest existing parent folder is %s",
-                    directory, parent));
-        }
-    }
-
     public HandshakeReply handshake(HandshakeMessage message) throws IOException {
-        checkFolderExists(message.getBuildDirectory());
-        checkFolderExists(message.getSourceDirectory());
-        writeMessage(JsonFormat.printer().print(message.toBuilder().setType("handshake")));
+        writeMessage(new GsonBuilder()
+                .setPrettyPrinting()
+                .create()
+                .toJson(message));
         return decodeResponse(HandshakeReply.class);
     }
 
@@ -178,15 +155,19 @@ public class CMakeServerConnection {
     }
 
     public ConfigureReply configure(String... cacheArguments) throws IOException {
-        ConfigureMessage.Builder message = ConfigureMessage.newBuilder();
+        ConfigureMessage message = new ConfigureMessage();
 
         // Insert a blank element to work around a bug in CMake 3.7.1 where the first element is ignored.
-        message.addCacheArguments("");
-        for (String cacheArgument : cacheArguments) {
-            message.addCacheArguments(cacheArgument);
+        message.cacheArguments = new String[cacheArguments.length + 1];
+        message.cacheArguments[0] = "";
+        for (int i = 0; i < cacheArguments.length; ++i) {
+            message.cacheArguments[i + 1] = cacheArguments[i];
         }
 
-        writeMessage(JsonFormat.printer().print(message.setType("configure")));
+        writeMessage(new GsonBuilder()
+                .setPrettyPrinting()
+                .create()
+                .toJson(message));
         return decodeResponse(ConfigureReply.class);
     }
 

@@ -15,7 +15,7 @@
  */
 package com.jomofisher.cmakeserver;
 
-import com.jomofisher.cmakeserver.model.HelloReply;
+import com.jomofisher.cmakeserver.modelv1.HelloReply;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,1 +1,0 @@
-prebuilts\protoc-3.1.0-win32\bin\protoc.exe -I=src\main\proto --java_out=src\main\java src\main\proto\messages.1.0.proto
