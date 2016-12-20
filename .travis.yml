@@ -32,15 +32,6 @@ matrix:
       - ./gradlew assemble check
 
   - os: osx
-    jdk: jdk7
-    before_script:
-      - wget https://dl.google.com/android/repository/android-ndk-r13b-darwin-x86_64.zip
-      - unzip android-ndk-r13b-darwin-x86_64.zip -d prebuilts/ > nul
-    script:
-      - ./gradlew assemble check
-
-  - os: osx
-    jdk: oraclejdk8
     before_script:
       - wget https://dl.google.com/android/repository/android-ndk-r13b-darwin-x86_64.zip
       - unzip android-ndk-r13b-darwin-x86_64.zip -d prebuilts/ > nul
