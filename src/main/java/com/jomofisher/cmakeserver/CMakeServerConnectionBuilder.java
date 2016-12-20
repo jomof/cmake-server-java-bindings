@@ -15,7 +15,7 @@
  */
 package com.jomofisher.cmakeserver;
 
-import com.jomofisher.cmakeserver.modelv1.HelloReply;
+import com.jomofisher.cmakeserver.modelv1.HelloResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,9 +24,10 @@ import java.util.Map;
 public class CMakeServerConnectionBuilder {
     final private File cmakeInstallPath;
     final private Map<String, String> cmakeProcessEnvironment;
-    private boolean allowExtraMessageFields = true;
     private ProgressReceiver progressReceiver = null;
+    private MessageReceiver messageReceiver = null;
     private DiagnosticReceiver diagnosticReceiver = null;
+    private DeserializationMonitor deserializationMonitor = null;
 
     public CMakeServerConnectionBuilder(File cmakeInstallPath) {
         this.cmakeInstallPath = cmakeInstallPath;
@@ -41,7 +42,7 @@ public class CMakeServerConnectionBuilder {
      */
     public CMakeServerConnection create() throws IOException {
         CMakeServerConnection connection = new CMakeServerConnection(this);
-        HelloReply reply = connection.connect();
+        HelloResult reply = connection.connect();
         return connection;
     }
 
@@ -49,17 +50,26 @@ public class CMakeServerConnectionBuilder {
         return cmakeInstallPath;
     }
 
-    public boolean getAllowExtraMessageFields() {
-        return allowExtraMessageFields;
+    public CMakeServerConnectionBuilder setDeserializationMonitor(DeserializationMonitor deserializationMonitor) {
+        this.deserializationMonitor = deserializationMonitor;
+        return this;
     }
 
-    public CMakeServerConnectionBuilder setAllowExtraMessageFields(boolean allowExtraMessageFields) {
-        this.allowExtraMessageFields = allowExtraMessageFields;
-        return this;
+    public DeserializationMonitor getDeserializationMonitor() {
+        return deserializationMonitor;
     }
 
     public ProgressReceiver getProgressReceiver() {
         return progressReceiver;
+    }
+
+    public CMakeServerConnectionBuilder setMessageReceiver(MessageReceiver messageReceiver) {
+        this.messageReceiver = messageReceiver;
+        return this;
+    }
+
+    public MessageReceiver getMessageReceiver() {
+return messageReceiver;
     }
 
     public CMakeServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {

@@ -6,7 +6,7 @@ Creates java bindings for CMake Server. Example usage,
             CMakeServerConnection connection =
                     new CMakeServerConnectionBuilder(getCMakeInstallFolder())
                             .create();
-            HandshakeMessage message = new HandshakeMessage();
+            HandshakeRequest message = new HandshakeRequest();
             message.cookie = "my-cookie";
             message.generator = "Ninja";
             message.sourceDirectory = "./hello-world";
@@ -16,7 +16,7 @@ Creates java bindings for CMake Server. Example usage,
             message.protocolVersion = version;
             connection.configure();
             connection.compute();
-            CodeModelReply codemodelReply = connection.codemodel();
+            CodeModel codemodel = connection.codemodel();
 
 [Download cmakeserver-1.0-alpha1.jar] (https://github.com/jomof/cmake-server-java-bindings/releases/tag/cmakeserver-1.0-alpha1)
 

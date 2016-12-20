@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmakeserver;
+package com.jomofisher.tests.cmakeserver;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

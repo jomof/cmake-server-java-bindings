@@ -21,8 +21,6 @@ import com.jomofisher.cmakeserver.modelv1.*;
 
 import java.io.*;
 
-import static com.jomofisher.cmakeserver.JsonUtils.checkForExtraFields;
-
 @SuppressWarnings("unused")
 public class CMakeServerConnection {
     private final CMakeServerConnectionBuilder builder;
@@ -88,15 +86,17 @@ public class CMakeServerConnection {
 
         // Process interactive messages.
         while (messageType.equals("message") || messageType.equals("progress")) {
-            if (builder.getProgressReceiver() != null) {
-                switch (messageType) {
-                    case "message":
-                        builder.getProgressReceiver().receiveMessage(gson.fromJson(message, MessageReply.class));
+            switch (messageType) {
+                case "message":
+                    if (builder.getMessageReceiver() != null) {
+                        builder.getMessageReceiver().receive(gson.fromJson(message, InteractiveMessage.class));
+                    }
+                    break;
+                case "progress":
+                    if (builder.getProgressReceiver() != null) {
+                        builder.getProgressReceiver().receive(gson.fromJson(message, InteractiveProgress.class));
                         break;
-                    case "progress":
-                        builder.getProgressReceiver().receiveProgress(gson.fromJson(message, ProgressReply.class));
-                        break;
-                }
+                    }
             }
             message = readMessage();
             messageType = gson.fromJson(message, TypeOfMessage.class).type;
@@ -106,8 +106,8 @@ public class CMakeServerConnection {
         switch (messageType) {
             case "hello":
             case "reply":
-                if (!builder.getAllowExtraMessageFields()) {
-                    checkForExtraFields(message, clazz);
+                if (builder.getDeserializationMonitor() != null) {
+                    builder.getDeserializationMonitor().receive(message, clazz);
                 }
                 return gson.fromJson(message, clazz);
             default:
@@ -115,7 +115,7 @@ public class CMakeServerConnection {
         }
     }
 
-    public HelloReply connect() throws IOException {
+    public HelloResult connect() throws IOException {
         ProcessBuilder processBuilder;
         if (System.getProperty("os.name").contains("Windows")) {
             processBuilder = new ProcessBuilder(String.format("%s\\cmake",
@@ -133,52 +133,45 @@ public class CMakeServerConnection {
         input = new BufferedReader(new InputStreamReader(process.getInputStream()));
         output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-        return decodeResponse(HelloReply.class);
+        return decodeResponse(HelloResult.class);
     }
 
-    private HandshakeReply handshake(String message) throws IOException {
-        writeMessage(message);
-        return decodeResponse(HandshakeReply.class);
-    }
-
-    public HandshakeReply handshake(HandshakeMessage message) throws IOException {
+    public HandshakeResult handshake(HandshakeRequest message) throws IOException {
         writeMessage(new GsonBuilder()
                 .setPrettyPrinting()
                 .create()
                 .toJson(message));
-        return decodeResponse(HandshakeReply.class);
+        return decodeResponse(HandshakeResult.class);
     }
 
-    public GlobalSettingsReply globalSettings() throws IOException {
+    public GlobalSettings globalSettings() throws IOException {
         writeMessage("{\"type\":\"globalSettings\"}");
-        return decodeResponse(GlobalSettingsReply.class);
+        return decodeResponse(GlobalSettings.class);
     }
 
-    public ConfigureReply configure(String... cacheArguments) throws IOException {
-        ConfigureMessage message = new ConfigureMessage();
+    public ConfigureResult configure(String... cacheArguments) throws IOException {
+        ConfigureRequest message = new ConfigureRequest();
 
         // Insert a blank element to work around a bug in CMake 3.7.1 where the first element is ignored.
         message.cacheArguments = new String[cacheArguments.length + 1];
         message.cacheArguments[0] = "";
-        for (int i = 0; i < cacheArguments.length; ++i) {
-            message.cacheArguments[i + 1] = cacheArguments[i];
-        }
+        System.arraycopy(cacheArguments, 0, message.cacheArguments, 1, cacheArguments.length);
 
         writeMessage(new GsonBuilder()
                 .setPrettyPrinting()
                 .create()
                 .toJson(message));
-        return decodeResponse(ConfigureReply.class);
+        return decodeResponse(ConfigureResult.class);
     }
 
-    public ComputeReply compute() throws IOException {
+    public ComputeResult compute() throws IOException {
         writeMessage("{\"type\":\"compute\"}");
-        return decodeResponse(ComputeReply.class);
+        return decodeResponse(ComputeResult.class);
     }
 
-    public CodeModelReply codemodel() throws IOException {
+    public CodeModel codemodel() throws IOException {
         writeMessage("{\"type\":\"codemodel\"}");
-        return decodeResponse(CodeModelReply.class);
+        return decodeResponse(CodeModel.class);
     }
 }
 

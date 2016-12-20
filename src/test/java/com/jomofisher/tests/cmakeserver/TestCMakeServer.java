@@ -15,10 +15,8 @@
  */
 package com.jomofisher.tests.cmakeserver;
 
-import static com.google.common.truth.Truth.assertThat;
-
-import com.jomofisher.cmakeserver.modelv1.*;
 import com.jomofisher.cmakeserver.*;
+import com.jomofisher.cmakeserver.modelv1.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -29,6 +27,8 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+
+import static com.google.common.truth.Truth.assertThat;
 
 @RunWith(JUnit4.class)
 public class TestCMakeServer {
@@ -103,25 +103,31 @@ public class TestCMakeServer {
     private CMakeServerConnectionBuilder getConnectionBuilder() {
         return getConnectionBuilder(getCMakeInstallFolder());
     }
+
     private CMakeServerConnectionBuilder getConnectionBuilder(File cmakeInstallFolder) {
         CMakeServerConnectionBuilder builder = new CMakeServerConnectionBuilder(cmakeInstallFolder)
-                .setAllowExtraMessageFields(false)
+                .setDeserializationMonitor(new DeserializationMonitor() {
+                    @Override
+                    public <T> void receive(String message, Class<T> clazz) {
+                        JsonUtils.checkForExtraFields(message, clazz);
+                    }
+                })
                 .setDiagnosticReceiver(new DiagnosticReceiver() {
                     @Override
                     public void receive(String diagnosticMessage) {
                         System.err.printf(diagnosticMessage);
                     }
                 })
-                .setProgressReceiver(new ProgressReceiver() {
+                .setMessageReceiver(new MessageReceiver() {
                     @Override
-                    public void receiveMessage(MessageReply message) {
+                    public void receive(InteractiveMessage message) {
                         System.err.printf("Message: %s\n", message.message);
                     }
-
+                })
+                .setProgressReceiver(new ProgressReceiver() {
                     @Override
-                    public void receiveProgress(ProgressReply progress) {
-                        System.err.printf("Progress: %s of %s\n", progress.progressCurrent,
-                                       progress.progressMaximum);
+                    public void receive(InteractiveProgress progress) {
+                        System.err.printf("Progress: %s of %s\n", progress.progressCurrent, progress.progressMaximum);
                     }
                 });
 
@@ -144,12 +150,12 @@ public class TestCMakeServer {
         return new File(workspaceFolder, "test-data/cmake-projects/");
     }
 
-    private HandshakeMessage getHelloWorldHandshake() throws IOException {
-        HandshakeMessage message = new HandshakeMessage();
+    private HandshakeRequest getHelloWorldHandshake() throws IOException {
+        HandshakeRequest message = new HandshakeRequest();
         message.cookie = "my-cookie";
         message.generator = "Ninja";
         message.sourceDirectory = new File(getSampleProjectsFolder(), "hello-world")
-                        .getAbsolutePath().replace('\\', '/');
+                .getAbsolutePath().replace('\\', '/');
         message.buildDirectory = getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/');
         ProtocolVersion version = new ProtocolVersion();
         version.major = 1;
@@ -157,12 +163,12 @@ public class TestCMakeServer {
         return message;
     }
 
-    private HandshakeMessage getAndroidSharedLibHandshake() throws IOException {
-        HandshakeMessage message = new HandshakeMessage();
+    private HandshakeRequest getAndroidSharedLibHandshake() throws IOException {
+        HandshakeRequest message = new HandshakeRequest();
         message.cookie = "my-cookie";
         message.generator = "Ninja";
         message.sourceDirectory = new File(getSampleProjectsFolder(), "android-shared-lib")
-                        .getAbsolutePath().replace('\\', '/');
+                .getAbsolutePath().replace('\\', '/');
         message.buildDirectory = getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/');
         ProtocolVersion version = new ProtocolVersion();
         version.major = 1;
@@ -178,37 +184,37 @@ public class TestCMakeServer {
     @Test
     public void testHandshake() throws Exception {
         CMakeServerConnection connection = getConnectionBuilder().create();
-        HandshakeReply handshakeReply = connection.handshake(getHelloWorldHandshake());
+        HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
     }
 
     @Test
     public void testConfigure() throws Exception {
         CMakeServerConnection connection = getConnectionBuilder().create();
-        HandshakeReply handshakeReply = connection.handshake(getHelloWorldHandshake());
+        HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
         connection.configure();
     }
 
     @Test
     public void testCompute() throws Exception {
         CMakeServerConnection connection = getConnectionBuilder().create();
-        HandshakeReply handshakeReply = connection.handshake(getHelloWorldHandshake());
+        HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
         connection.configure();
-        ComputeReply computeReply = connection.compute();
+        ComputeResult computeResult = connection.compute();
     }
 
     @Test
     public void testCodeModel() throws Exception {
         CMakeServerConnection connection = getConnectionBuilder().create();
-        HandshakeReply handshakeReply = connection.handshake(getHelloWorldHandshake());
+        HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
         connection.configure();
-        ComputeReply computeReply = connection.compute();
-        CodeModelReply codemodelReply = connection.codemodel();
+        ComputeResult computeResult = connection.compute();
+        CodeModel codemodelReply = connection.codemodel();
     }
 
     @Test
     public void testAndroidCodeModel() throws Exception {
         CMakeServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
-        HandshakeReply handshakeReply = connection.handshake(getAndroidSharedLibHandshake());
+        HandshakeResult handshakeResult = connection.handshake(getAndroidSharedLibHandshake());
         connection.configure(
                 "-DANDROID_ABI=arm64-v8a",
                 "-DANDROID_NDK=prebuilts\\android-ndk-r13b",
@@ -218,16 +224,16 @@ public class TestCMakeServer {
                 "-DANDROID_NATIVE_API_LEVEL=21",
                 "-DANDROID_TOOLCHAIN=gcc",
                 "-DCMAKE_CXX_FLAGS=");
-        ComputeReply computeReply = connection.compute();
-        CodeModelReply codemodelReply = connection.codemodel();
+        ComputeResult computeResult = connection.compute();
+        CodeModel codemodelReply = connection.codemodel();
     }
 
     @Test
     public void testGlobalSettings() throws Exception {
         CMakeServerConnection connection = getConnectionBuilder().create();
-        HandshakeReply handshakeReply = connection.handshake(getHelloWorldHandshake());
-        GlobalSettingsReply globalSettingsReply = connection.globalSettings();
-        assertThat(globalSettingsReply.generator).isEqualTo("Ninja");
+        HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
+        GlobalSettings globalSettings = connection.globalSettings();
+        assertThat(globalSettings.generator).isEqualTo("Ninja");
     }
 
     @Test
@@ -237,7 +243,7 @@ public class TestCMakeServer {
             CMakeServerConnection connection =
                     new CMakeServerConnectionBuilder(getCMakeInstallFolder())
                             .create();
-            HandshakeMessage message = new HandshakeMessage();
+            HandshakeRequest message = new HandshakeRequest();
             message.cookie = "my-cookie";
             message.generator = "Ninja";
             message.sourceDirectory = "./hello-world";
@@ -247,7 +253,7 @@ public class TestCMakeServer {
             message.protocolVersion = version;
             connection.configure();
             connection.compute();
-            CodeModelReply codemodelReply = connection.codemodel();
+            CodeModel codemodel = connection.codemodel();
         }
     }
 
