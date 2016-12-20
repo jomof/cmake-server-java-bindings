@@ -334,7 +334,7 @@ class ProtoTypeAdapter
         Method method = mapOfMethods.get(clazz);
         if (method == null) {
             method = clazz.getMethod(methodName, methodParamTypes);
-            mapOfMethods.putIfAbsent(clazz, method);
+            mapOfMethods.put(clazz, method);
             // NB: it doesn't matter which method we return in the event of a race.
         }
         return method;

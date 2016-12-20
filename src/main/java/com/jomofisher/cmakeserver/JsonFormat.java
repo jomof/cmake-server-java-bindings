@@ -121,7 +121,7 @@ class JsonFormat {
     public static class TypeRegistry {
         private static class EmptyTypeRegistryHolder {
             private static final TypeRegistry EMPTY =
-                    new TypeRegistry(Collections.emptyMap());
+                    new TypeRegistry(Collections.<String, Descriptor>emptyMap());
         }
 
         public static TypeRegistry getEmptyTypeRegistry() {
