@@ -261,38 +261,63 @@ class JsonFormat {
         private static final Map<String, WellKnownTypePrinter> wellKnownTypePrinters =
                 buildWellKnownTypePrinters();
 
-        private static Map<String, WellKnownTypePrinter> buildWellKnownTypePrinters() {
-            Map<String, WellKnownTypePrinter> printers = new HashMap<>();
-            // Special-case Any.
-            printers.put(
-                    Any.getDescriptor().getFullName(),
-                    PrinterImpl::printAny);
-            // Special-case wrapper types.
-            WellKnownTypePrinter wrappersPrinter =
-                    PrinterImpl::printWrapper;
-            printers.put(BoolValue.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(Int32Value.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(UInt32Value.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(Int64Value.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(UInt64Value.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(StringValue.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(BytesValue.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(FloatValue.getDescriptor().getFullName(), wrappersPrinter);
-            printers.put(DoubleValue.getDescriptor().getFullName(), wrappersPrinter);
-            // Special-case Struct.
-            printers.put(
-                    Struct.getDescriptor().getFullName(),
-                    PrinterImpl::printStruct);
-            // Special-case Value.
-            printers.put(
-                    Value.getDescriptor().getFullName(),
-                    PrinterImpl::printValue);
-            // Special-case ListValue.
-            printers.put(
-                    ListValue.getDescriptor().getFullName(),
-                    PrinterImpl::printListValue);
-            return printers;
-        }
+         private static Map<String, WellKnownTypePrinter> buildWellKnownTypePrinters() {
+      Map<String, WellKnownTypePrinter> printers = new HashMap<String, WellKnownTypePrinter>();
+      // Special-case Any.
+      printers.put(
+          Any.getDescriptor().getFullName(),
+          new WellKnownTypePrinter() {
+            @Override
+            public void print(PrinterImpl printer, MessageOrBuilder message) throws IOException {
+              printer.printAny(message);
+            }
+          });
+      // Special-case wrapper types.
+      WellKnownTypePrinter wrappersPrinter =
+          new WellKnownTypePrinter() {
+            @Override
+            public void print(PrinterImpl printer, MessageOrBuilder message) throws IOException {
+              printer.printWrapper(message);
+            }
+          };
+      printers.put(BoolValue.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(Int32Value.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(UInt32Value.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(Int64Value.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(UInt64Value.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(StringValue.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(BytesValue.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(FloatValue.getDescriptor().getFullName(), wrappersPrinter);
+      printers.put(DoubleValue.getDescriptor().getFullName(), wrappersPrinter);
+      // Special-case Struct.
+      printers.put(
+          Struct.getDescriptor().getFullName(),
+          new WellKnownTypePrinter() {
+            @Override
+            public void print(PrinterImpl printer, MessageOrBuilder message) throws IOException {
+              printer.printStruct(message);
+            }
+          });
+      // Special-case Value.
+      printers.put(
+          Value.getDescriptor().getFullName(),
+          new WellKnownTypePrinter() {
+            @Override
+            public void print(PrinterImpl printer, MessageOrBuilder message) throws IOException {
+              printer.printValue(message);
+            }
+          });
+      // Special-case ListValue.
+      printers.put(
+          ListValue.getDescriptor().getFullName(),
+          new WellKnownTypePrinter() {
+            @Override
+            public void print(PrinterImpl printer, MessageOrBuilder message) throws IOException {
+              printer.printListValue(message);
+            }
+          });
+      return printers;
+    }
 
         /**
          * Prints google.protobuf.Any
