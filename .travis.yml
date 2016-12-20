@@ -1,8 +1,8 @@
 language: java
-jdk:
-- openjdk7 # OpenJDK7
-- oraclejdk7 # Oracle's JDK7
-- oraclejdk8 # Oracle's JDK8
+#jdk:
+#- jdk6 # OpenJDK7
+#- jdk7 # Oracle's JDK7
+#- oraclejdk8 # Oracle's JDK8
 sudo: false
 matrix:
   include:
