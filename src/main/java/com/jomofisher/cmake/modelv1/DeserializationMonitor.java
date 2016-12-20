@@ -1,4 +1,4 @@
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmake.modelv1;
 
 /**
  * Used to monitor deserialization. Can be used to check for missing fields in receiving class.

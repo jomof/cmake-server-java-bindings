@@ -1,4 +1,4 @@
-package com.jomofisher.cmakeserver.modelv1;
+package com.jomofisher.cmake.modelv1;
 
 public class FileGroup {
     public String compileFlags;

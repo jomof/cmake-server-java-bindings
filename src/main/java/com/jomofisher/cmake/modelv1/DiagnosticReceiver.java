@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmakeserver;
-
-import com.jomofisher.cmakeserver.modelv1.InteractiveProgress;
+package com.jomofisher.cmake.modelv1;
 
 /**
- * Handles progress updates received interactively during configure, etc.
+ * Receives diagnostic logging messages from this library.
  */
-public interface ProgressReceiver {
-    void receive(InteractiveProgress progress);
+public interface DiagnosticReceiver {
+    void receive(String diagnosticMessage);
 }

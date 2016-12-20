@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.tests.cmakeserver;
+package com.jomofisher.tests.cmake;
 
-import com.jomofisher.cmakeserver.*;
-import com.jomofisher.cmakeserver.modelv1.*;
+import com.jomofisher.cmake.CMake;
+import com.jomofisher.cmake.modelv1.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -100,12 +100,24 @@ public class TestCMakeServer {
         }
     }
 
-    private CMakeServerConnectionBuilder getConnectionBuilder() {
+    private ServerConnectionBuilder getConnectionBuilder() {
         return getConnectionBuilder(getCMakeInstallFolder());
     }
 
-    private CMakeServerConnectionBuilder getConnectionBuilder(File cmakeInstallFolder) {
-        CMakeServerConnectionBuilder builder = new CMakeServerConnectionBuilder(cmakeInstallFolder)
+    private ServerConnectionBuilder getConnectionBuilder(File cmakeInstallFolder) {
+        CMake cmake = new CMake(cmakeInstallFolder);
+        // Add prebuilts ninja to the install path
+        if (detectedOS == OSType.Windows) {
+            String path = getNinjaInstallFolder() + ";" + cmake.environment().get("Path");
+            // Put gcc on the path
+            path = "c:\\tools\\msys64\\usr\\bin;" + path;
+            cmake.environment().put("Path", path);
+        } else {
+            String path = getNinjaInstallFolder() + ":" + cmake.environment().get("PATH");
+            cmake.environment().put("PATH", path);
+        }
+
+        ServerConnectionBuilder builder = cmake.newServerBuilder()
                 .setDeserializationMonitor(new DeserializationMonitor() {
                     @Override
                     public <T> void receive(String message, Class<T> clazz) {
@@ -130,17 +142,6 @@ public class TestCMakeServer {
                         System.err.printf("Progress: %s of %s\n", progress.progressCurrent, progress.progressMaximum);
                     }
                 });
-
-        // Add prebuilts ninja to the install path
-        if (detectedOS == OSType.Windows) {
-            String path = getNinjaInstallFolder() + ";" + builder.environment().get("Path");
-            // Put gcc on the path
-            path = "c:\\tools\\msys64\\usr\\bin;" + path;
-            builder.environment().put("Path", path);
-        } else {
-            String path = getNinjaInstallFolder() + ":" + builder.environment().get("PATH");
-            builder.environment().put("PATH", path);
-        }
 
         return builder;
     }
@@ -178,25 +179,25 @@ public class TestCMakeServer {
 
     @Test
     public void testConnect() throws Exception {
-        CMakeServerConnection connection = getConnectionBuilder().create();
+        ServerConnection connection = getConnectionBuilder().create();
     }
 
     @Test
     public void testHandshake() throws Exception {
-        CMakeServerConnection connection = getConnectionBuilder().create();
+        ServerConnection connection = getConnectionBuilder().create();
         HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
     }
 
     @Test
     public void testConfigure() throws Exception {
-        CMakeServerConnection connection = getConnectionBuilder().create();
+        ServerConnection connection = getConnectionBuilder().create();
         HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
         connection.configure();
     }
 
     @Test
     public void testCompute() throws Exception {
-        CMakeServerConnection connection = getConnectionBuilder().create();
+        ServerConnection connection = getConnectionBuilder().create();
         HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
         connection.configure();
         ComputeResult computeResult = connection.compute();
@@ -204,7 +205,7 @@ public class TestCMakeServer {
 
     @Test
     public void testCodeModel() throws Exception {
-        CMakeServerConnection connection = getConnectionBuilder().create();
+        ServerConnection connection = getConnectionBuilder().create();
         HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
         connection.configure();
         ComputeResult computeResult = connection.compute();
@@ -213,7 +214,7 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidCodeModel() throws Exception {
-        CMakeServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
+        ServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
         HandshakeResult handshakeResult = connection.handshake(getAndroidSharedLibHandshake());
         connection.configure(
                 "-DANDROID_ABI=arm64-v8a",
@@ -230,7 +231,7 @@ public class TestCMakeServer {
 
     @Test
     public void testGlobalSettings() throws Exception {
-        CMakeServerConnection connection = getConnectionBuilder().create();
+        ServerConnection connection = getConnectionBuilder().create();
         HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
         GlobalSettings globalSettings = connection.globalSettings();
         assertThat(globalSettings.generator).isEqualTo("Ninja");
@@ -240,9 +241,9 @@ public class TestCMakeServer {
     public void testExample() throws Exception {
         if (false) { // Just make sure it compiles
             // Usage example
-            CMakeServerConnection connection =
-                    new CMakeServerConnectionBuilder(getCMakeInstallFolder())
-                            .create();
+            ServerConnection connection = new CMake(getCMakeInstallFolder())
+                    .newServerBuilder()
+                    .create();
             HandshakeRequest message = new HandshakeRequest();
             message.cookie = "my-cookie";
             message.generator = "Ninja";

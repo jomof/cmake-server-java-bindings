@@ -1,4 +1,4 @@
-package com.jomofisher.cmakeserver.modelv1;
+package com.jomofisher.cmake.modelv1;
 
 public class Version {
     public boolean isDirty;

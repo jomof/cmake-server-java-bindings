@@ -13,21 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmakeserver;
+package com.jomofisher.cmake.modelv1;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.jomofisher.cmakeserver.modelv1.*;
 
 import java.io.*;
 
 @SuppressWarnings("unused")
-public class CMakeServerConnection {
-    private final CMakeServerConnectionBuilder builder;
+public class ServerConnection {
+    private final ServerConnectionBuilder builder;
     private BufferedReader input;
     private BufferedWriter output;
 
-    CMakeServerConnection(CMakeServerConnectionBuilder builder) {
+    ServerConnection(ServerConnectionBuilder builder) {
         this.builder = builder;
     }
 

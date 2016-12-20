@@ -1,6 +1,6 @@
-package com.jomofisher.cmakeserver.modelv1;
+package com.jomofisher.cmake.modelv1;
 
-public class HandshakeResult {
+public class ConfigureResult {
     public String type;
     public String cookie;
     public String inReplyTo;

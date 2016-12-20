@@ -1,6 +1,4 @@
-package com.jomofisher.cmakeserver;
-
-import com.jomofisher.cmakeserver.modelv1.InteractiveMessage;
+package com.jomofisher.cmake.modelv1;
 
 /**
  * Handles messages received interactively during configure, etc.

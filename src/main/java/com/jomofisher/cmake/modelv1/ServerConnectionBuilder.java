@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmakeserver;
-
-import com.jomofisher.cmakeserver.modelv1.HelloResult;
+package com.jomofisher.cmake.modelv1;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-public class CMakeServerConnectionBuilder {
+public class ServerConnectionBuilder {
     final private File cmakeInstallPath;
     final private Map<String, String> cmakeProcessEnvironment;
     private ProgressReceiver progressReceiver = null;
@@ -29,9 +27,9 @@ public class CMakeServerConnectionBuilder {
     private DiagnosticReceiver diagnosticReceiver = null;
     private DeserializationMonitor deserializationMonitor = null;
 
-    public CMakeServerConnectionBuilder(File cmakeInstallPath) {
+    public ServerConnectionBuilder(File cmakeInstallPath, Map<String, String> cmakeProcessEnvironment) {
         this.cmakeInstallPath = cmakeInstallPath;
-        this.cmakeProcessEnvironment = new ProcessBuilder().environment();
+        this.cmakeProcessEnvironment = cmakeProcessEnvironment;
     }
 
     /**
@@ -40,8 +38,8 @@ public class CMakeServerConnectionBuilder {
      * @return A connection to the CMake server that can be used to interact with.
      * @throws IOException if there was a problem spawning the process.
      */
-    public CMakeServerConnection create() throws IOException {
-        CMakeServerConnection connection = new CMakeServerConnection(this);
+    public ServerConnection create() throws IOException {
+        ServerConnection connection = new ServerConnection(this);
         HelloResult reply = connection.connect();
         return connection;
     }
@@ -50,21 +48,21 @@ public class CMakeServerConnectionBuilder {
         return cmakeInstallPath;
     }
 
-    public CMakeServerConnectionBuilder setDeserializationMonitor(DeserializationMonitor deserializationMonitor) {
-        this.deserializationMonitor = deserializationMonitor;
-        return this;
-    }
-
     public DeserializationMonitor getDeserializationMonitor() {
         return deserializationMonitor;
+    }
+
+    public ServerConnectionBuilder setDeserializationMonitor(DeserializationMonitor deserializationMonitor) {
+        this.deserializationMonitor = deserializationMonitor;
+        return this;
     }
 
     public ProgressReceiver getProgressReceiver() {
         return progressReceiver;
     }
 
-    public CMakeServerConnectionBuilder setMessageReceiver(MessageReceiver messageReceiver) {
-        this.messageReceiver = messageReceiver;
+    public ServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {
+        this.progressReceiver = progressReceiver;
         return this;
     }
 
@@ -72,8 +70,8 @@ public class CMakeServerConnectionBuilder {
 return messageReceiver;
     }
 
-    public CMakeServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {
-        this.progressReceiver = progressReceiver;
+    public ServerConnectionBuilder setMessageReceiver(MessageReceiver messageReceiver) {
+        this.messageReceiver = messageReceiver;
         return this;
     }
 
@@ -81,7 +79,7 @@ return messageReceiver;
         return diagnosticReceiver;
     }
 
-    public CMakeServerConnectionBuilder setDiagnosticReceiver(DiagnosticReceiver diagnosticReceiver) {
+    public ServerConnectionBuilder setDiagnosticReceiver(DiagnosticReceiver diagnosticReceiver) {
         this.diagnosticReceiver = diagnosticReceiver;
         return this;
     }

@@ -1,4 +1,4 @@
-package com.jomofisher.cmakeserver.modelv1;
+package com.jomofisher.cmake.modelv1;
 
 public class GlobalSettings {
     public String type;
