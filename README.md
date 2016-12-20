@@ -3,9 +3,9 @@
 # CMake Server Java Bindings
 Creates java bindings for CMake Server. Example usage,
 
-            CMakeServerConnection connection =
-                    new CMakeServerConnectionBuilder(getCMakeInstallFolder())
-                            .create();
+            ServerConnection connection = new CMake(getCMakeInstallFolder())
+                    .newServerBuilder()
+                    .create();
             HandshakeRequest message = new HandshakeRequest();
             message.cookie = "my-cookie";
             message.generator = "Ninja";

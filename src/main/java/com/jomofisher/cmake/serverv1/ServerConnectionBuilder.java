@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmake.modelv1;
+package com.jomofisher.cmake.serverv1;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class ServerConnectionBuilder {
     }
 
     /**
-     * Start the server and return a connection to interact with it.
+     * Start the server and return a connection to it.
      *
      * @return A connection to the CMake server that can be used to interact with.
      * @throws IOException if there was a problem spawning the process.
@@ -44,11 +44,11 @@ public class ServerConnectionBuilder {
         return connection;
     }
 
-    public File getCmakeInstallPath() {
+    File getCmakeInstallPath() {
         return cmakeInstallPath;
     }
 
-    public DeserializationMonitor getDeserializationMonitor() {
+    DeserializationMonitor getDeserializationMonitor() {
         return deserializationMonitor;
     }
 
@@ -57,7 +57,7 @@ public class ServerConnectionBuilder {
         return this;
     }
 
-    public ProgressReceiver getProgressReceiver() {
+    ProgressReceiver getProgressReceiver() {
         return progressReceiver;
     }
 
@@ -66,7 +66,7 @@ public class ServerConnectionBuilder {
         return this;
     }
 
-    public MessageReceiver getMessageReceiver() {
+    MessageReceiver getMessageReceiver() {
 return messageReceiver;
     }
 
@@ -75,7 +75,7 @@ return messageReceiver;
         return this;
     }
 
-    public DiagnosticReceiver getDiagnosticReceiver() {
+    DiagnosticReceiver getDiagnosticReceiver() {
         return diagnosticReceiver;
     }
 
@@ -84,7 +84,7 @@ return messageReceiver;
         return this;
     }
 
-    public Map<String, String> environment() {
+    Map<String, String> environment() {
         return this.cmakeProcessEnvironment;
     }
 }

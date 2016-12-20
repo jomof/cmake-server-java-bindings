@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmake.modelv1;
+package com.jomofisher.cmake.serverv1;
 
-/**
- * Handles progress updates received interactively during configure, etc.
- */
-public interface ProgressReceiver {
-    void receive(InteractiveProgress progress);
+class TypeOfMessage {
+    final public String type;
+    private TypeOfMessage() {
+        this.type = null;
+    }
 }

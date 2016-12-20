@@ -13,11 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmake.modelv1;
+package com.jomofisher.cmake.serverv1;
 
-/**
- * Receives diagnostic logging messages from this library.
- */
-public interface DiagnosticReceiver {
-    void receive(String diagnosticMessage);
+public class InteractiveMessage {
+    final public String type;
+    final public String cookie;
+    final public String inReplyTo;
+    final public String message;
+    final public String title;
+
+    private InteractiveMessage() {
+        this.type = null;
+        this.cookie = null;
+        this.inReplyTo = null;
+        this.message = null;
+        this.title = null;
+    }
 }

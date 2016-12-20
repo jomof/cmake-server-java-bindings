@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jomofisher.cmake.modelv1;
+package com.jomofisher.cmake.serverv1;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.*;
 
-@SuppressWarnings("unused")
 public class ServerConnection {
     private final ServerConnectionBuilder builder;
     private BufferedReader input;

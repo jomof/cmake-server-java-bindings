@@ -16,7 +16,7 @@
 package com.jomofisher.tests.cmake;
 
 import com.jomofisher.cmake.CMake;
-import com.jomofisher.cmake.modelv1.*;
+import com.jomofisher.cmake.serverv1.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -117,7 +117,7 @@ public class TestCMakeServer {
             cmake.environment().put("PATH", path);
         }
 
-        ServerConnectionBuilder builder = cmake.newServerBuilder()
+        return cmake.newServerBuilder()
                 .setDeserializationMonitor(new DeserializationMonitor() {
                     @Override
                     public <T> void receive(String message, Class<T> clazz) {
@@ -142,8 +142,6 @@ public class TestCMakeServer {
                         System.err.printf("Progress: %s of %s\n", progress.progressCurrent, progress.progressMaximum);
                     }
                 });
-
-        return builder;
     }
 
     private File getSampleProjectsFolder() {
@@ -227,6 +225,7 @@ public class TestCMakeServer {
                 "-DCMAKE_CXX_FLAGS=");
         ComputeResult computeResult = connection.compute();
         CodeModel codemodelReply = connection.codemodel();
+        GlobalSettings globalSettings = connection.globalSettings();
     }
 
     @Test
@@ -252,8 +251,8 @@ public class TestCMakeServer {
             ProtocolVersion version = new ProtocolVersion();
             version.major = 1;
             message.protocolVersion = version;
-            connection.configure();
-            connection.compute();
+            ConfigureResult configureResult = connection.configure();
+            ComputeResult computeResult = connection.compute();
             CodeModel codemodel = connection.codemodel();
         }
     }
