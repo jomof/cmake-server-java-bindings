@@ -104,7 +104,6 @@ public class TestCMakeServer {
                 "Bolognese", "Boxer", "Briard", "Griffon", "Chihuahua", "Dachshund", "Dalmatian", "Pinscher",
                 "Setter", "Pointer", "Pyrenees", "Harrier", "Havanese", "Keeshond", "Kuvasz", "Labradoodle",
                 "Mutt", "Otterhound", "Papillon", "Pug", "Puli", "Ridgeback", "Rottweiler", "Whippet", "Yorkipoo"
-
         };
         String verb[] = new String[]{
                 "Runs", "Walks", "Speaks", "Waits", "Learns", "Opens", "Closes", "Calls", "Asks", "Becomes", "Helps",
