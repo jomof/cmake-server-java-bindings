@@ -24,6 +24,7 @@ public class ServerConnectionBuilder {
     final private Map<String, String> cmakeProcessEnvironment;
     private ProgressReceiver progressReceiver = null;
     private MessageReceiver messageReceiver = null;
+    private SignalReceiver signalReceiver = null;
     private DiagnosticReceiver diagnosticReceiver = null;
     private DeserializationMonitor deserializationMonitor = null;
 
@@ -63,6 +64,15 @@ public class ServerConnectionBuilder {
 
     public ServerConnectionBuilder setProgressReceiver(ProgressReceiver progressReceiver) {
         this.progressReceiver = progressReceiver;
+        return this;
+    }
+
+    SignalReceiver getSignalReceiver() {
+        return signalReceiver;
+    }
+
+    public ServerConnectionBuilder setSignalReceiver(SignalReceiver signalReceiver) {
+        this.signalReceiver = signalReceiver;
         return this;
     }
 

@@ -96,6 +96,11 @@ public class ServerConnection {
                         builder.getProgressReceiver().receive(gson.fromJson(message, InteractiveProgress.class));
                         break;
                     }
+                case "signal":
+                    if (builder.getProgressReceiver() != null) {
+                        builder.getProgressReceiver().receive(gson.fromJson(message, InteractiveProgress.class));
+                        break;
+                    }
             }
             message = readMessage();
             messageType = gson.fromJson(message, TypeOfMessage.class).type;

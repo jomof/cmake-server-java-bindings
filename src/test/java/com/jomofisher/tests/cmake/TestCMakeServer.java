@@ -15,6 +15,9 @@
  */
 package com.jomofisher.tests.cmake;
 
+import com.google.common.base.Charsets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jomofisher.cmake.CMake;
 import com.jomofisher.cmake.serverv1.*;
 import org.junit.Test;
@@ -24,9 +27,9 @@ import org.junit.runners.JUnit4;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Random;
 
 import static com.google.common.truth.Truth.assertThat;
 
@@ -49,10 +52,91 @@ public class TestCMakeServer {
         }
     }
 
+    private static int modAppend(String[] keys, StringBuilder hash, int remainingHash) {
+        int keySize = keys.length;
+        hash.append(keys[remainingHash % keySize]);
+        return remainingHash / keySize;
+    }
+
+    private static String literateHash(Object object) {
+        String adjective[] = new String[]{
+                "Deteriorating",
+                "Walking", "Running", "Sprinting", "Dashing", "Crashing", "Spirited", "Spiritual", "Ancient",
+                "Melting", "Boiling", "Evaporating", "Freezing", "Sublimating", "Triple", "Double", "Quadruple",
+                "Quintuple", "Octo", "Former", "Latter", "Formal", "Decorated", "Hypnotic", "Drunken", "Realizing",
+                "Gaseous", "Grassy", "Sandy", "Rocky", "Gigantic", "Hilarious", "Hard", "Soft", "Curious", "Rigid",
+                "Adorable", "Clean", "Elegant", "Turquoise", "Blue", "Green", "Famous", "Gifted", "Thankful",
+                "Brave", "Calm", "Mysterious", "Round", "Square", "Massive", "Faint", "Melodic", "Tall", "Ancient",
+                "Brief", "Swift", "Whispering", "Salty", "Weak", "Inspirational", "Cellar", "Better", "Best", "Early",
+                "Important", "Wild", "Swamp", "Arboreal", "Jungle", "Molten", "Frozen", "Aromatic", "Zippy", "Zesty",
+                "Comfortable", "Cozy", "Abstract", "Surreal", "Impressionist", "Cubist", "Fauvist", "Dadaist", "Pop",
+                "Nouveau", "Aesthetic", "Real", "Concrete", "Conceptual", "Deconstructed", "Digital", "Fantastic",
+                "Figurative", "Folk", "Future", "Geometric", "Gothic", "Typographic", "Lyrical", "Magical", "Maximum",
+                "Minimum", "Modern", "Naive", "Primitive", "Naive", "Objective", "Precision", "Psychedelic",
+                "Regional", "Romantic", "Rococo", "Resonating", "Space", "Symbolic", "Street", "Supreme",
+                "Penultimate", "Ultimate", "Underground", "Baroque"
+        };
+        String noun[] = new String[]{
+                "Dog", "Cat", "Mountain", "Ocean", "Submarine", "Salamander", "Tree", "Forest", "Rock", "Earth",
+                "Novel", "Hunter", "Teacher", "Fire", "Tower", "Lamp", "Flame", "Theory", "Love", "People", "History",
+                "World", "Map", "Family", "Door", "Window", "Music", "Bird", "Fact", "Area", "Language", "Rhythm",
+                "Bird", "Worm", "Time", "Year", "Hand", "Night", "Day", "Story", "Chemistry", "Painting", "Cigarette",
+                "Scene", "Mood", "Expression", "Foundation", "Grandfather", "Hope", "Selection", "Wine", "Passion",
+                "Happiness", "Republic", "Engine", "Hotel", "Motorcycle", "Leader", "Cousin", "Flute", "Piano",
+                "Beetle", "Spider", "Lion", "Snake", "Fish", "Shark", "Whale", "Ship", "Capsule", "Travel", "Train",
+                "Range", "Locus", "Pentagon", "Polygon", "Sphere", "Pyramid", "Tide", "Wheel", "Tire", "Engine",
+                "Seat", "Rose", "Tulip", "Azalea", "Chest", "Blouse", "Tiger", "Cube", "Scorpion", "Fox", "Sandwich",
+                "Taco", "Poem", "Novel", "Candle", "Sketch", "Painting", "Vine", "Ceramic", "Bowl", "Plate", "Spoon",
+                "Fork", "Hammock", "Cable", "Wire", "Diamond", "Ruby", "Emerald", "Comet", "Planet", "Star", "Moon",
+                "Rocket", "Sled", "Table", "Couch", "Bed", "Room", "Basket", "Box", "Envelope", "Robe", "Silk",
+                "Terrier", "Shepherd", "Sheep", "Cow", "Corgi", "Hill", "Lake", "Pond", "Mountain", "Plateau",
+                "Grocer", "Horse", "Bicycle", "Helmet", "Turtle", "Moose", "Mine", "Cave", "Core", "Snow", "Angel",
+                "Cactus", "Elephant", "Hippo", "Zippo", "Cigar", "Eagle", "Hawk", "Raptor", "Dinosaur", "Vegetable",
+                "Carrot", "Celery", "Gerbil", "Rabbit", "Pig", "Mouse", "Paintbrush", "Easel", "Shoe", "Sock",
+                "Wall", "Roof", "Drawer", "Straw", "Wick", "Gasoline", "Kerosene", "Blanket", "Pillow", "Musician",
+                "Artist", "Poet", "Chiclet", "Physics", "Chemistry", "Anatomy", "Astrobiology", "Biochemistry",
+                "Biogeography", "Biophysics", "Neuroscience", "Biotechnology", "Botany", "Cryobiology",
+                "Ecology", "Ethnobiology", "Gerontology", "Immunology", "Limnology", "Microbiology", "Neuroscience",
+                "Paleontology", "Parasitology", "Physiology", "Radiobiology", "Sociobiology", "Toxicology", "Zoology",
+                "Carnation", "Lily", "Thistle", "Orchid", "Sunflower", "Snapdragon", "Lavender", "Holly", "Peony",
+                "Marigold", "Lilac", "Ginger", "Aster", "Bloom", "Bell", "Corn", "Wheat", "Hound", "Akita", "Malamute",
+                "Spaniel", "Azawakh", "Barbet", "Basenji", "Collie", "Malinois", "Tervuren", "Picard", "Frise",
+                "Bolognese", "Boxer", "Briard", "Griffon", "Chihuahua", "Dachshund", "Dalmatian", "Pinscher",
+                "Setter", "Pointer", "Pyrenees", "Harrier", "Havanese", "Keeshond", "Kuvasz", "Labradoodle",
+                "Mutt", "Otterhound", "Papillon", "Pug", "Puli", "Ridgeback", "Rottweiler", "Whippet", "Yorkipoo"
+
+        };
+        String verb[] = new String[]{
+                "Runs", "Walks", "Speaks", "Waits", "Learns", "Opens", "Closes", "Calls", "Asks", "Becomes", "Helps",
+                "Plays", "Moves", "Lives", "Writes", "Stands", "Meets", "Continues", "Changes", "Creates", "Speaks",
+                "Grows", "Remembers", "Sends", "Builds", "Reaches", "Raises", "Hopes", "Supports", "Catches",
+                "Delights", "Entrances", "Improves", "Captures", "Befriends", "Elevates", "Erupts", "Raises", "Lowers",
+                "Extends", "Heightens", "Keeps", "Organizes", "Predicts", "Embiggens", "Waltzes", "Tunes"
+        };
+        StringBuilder hash = new StringBuilder();
+        int remainingHash = object.hashCode();
+        if (remainingHash < 0) {
+            remainingHash *= -1;
+            remainingHash = modAppend(noun, hash, remainingHash);
+            remainingHash = modAppend(verb, hash, remainingHash);
+        }
+        while (remainingHash > 1) {
+            remainingHash = modAppend(adjective, hash, remainingHash);
+            if (remainingHash > 0) {
+                remainingHash = modAppend(noun, hash, remainingHash);
+            }
+            if (remainingHash > 0) {
+                remainingHash = modAppend(verb, hash, remainingHash);
+            }
+        }
+        return hash.toString();
+    }
+
     private File getTemporaryBuildOutputFolder() throws IOException {
         Path basedir = FileSystems.getDefault().getPath("test-output").toAbsolutePath();
         basedir.toFile().mkdirs();
-        return Files.createTempDirectory(basedir, "cmake-bindings-test").toFile();
+        return new File(basedir.toFile(), String.format("build-output-%s",
+                literateHash(new Random().nextLong())));
     }
 
     private File getWorkspaceFolder() {
@@ -130,6 +214,16 @@ public class TestCMakeServer {
                         System.err.printf(diagnosticMessage);
                     }
                 })
+                .setSignalReceiver(new SignalReceiver() {
+                    @Override
+                    public void receive(InteractiveSignal signal) {
+                        System.err.printf("Signal: %s\n", signal.name);
+                        assertThat(signal.cookie).isNotNull();
+                        assertThat(signal.inReplyTo).isNotNull();
+                        assertThat(signal.type).isNotNull();
+                        assertThat(signal.type).isEqualTo("signal");
+                    }
+                })
                 .setMessageReceiver(new MessageReceiver() {
                     @Override
                     public void receive(InteractiveMessage message) {
@@ -138,6 +232,7 @@ public class TestCMakeServer {
                         assertThat(message.inReplyTo).isNotNull();
                         assertThat(message.message).isNotNull();
                         assertThat(message.type).isNotNull();
+                        assertThat(message.type).isEqualTo("message");
                     }
                 })
                 .setProgressReceiver(new ProgressReceiver() {
@@ -151,6 +246,7 @@ public class TestCMakeServer {
                         assertThat(progress.progressMaximum).isNotNull();
                         assertThat(progress.progressMessage).isNotNull();
                         assertThat(progress.type).isNotNull();
+                        assertThat(progress.type).isEqualTo("progress");
                     }
                 });
     }
@@ -215,10 +311,12 @@ public class TestCMakeServer {
     @Test
     public void testCodeModel() throws Exception {
         ServerConnection connection = getConnectionBuilder().create();
-        HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
+        HandshakeRequest handshakeRequest = getHelloWorldHandshake();
+        HandshakeResult handshakeResult = connection.handshake(handshakeRequest);
         connection.configure();
         ComputeResult computeResult = connection.compute();
         CodeModel codemodelReply = connection.codemodel();
+        recordUnique(codemodelReply, handshakeRequest.buildDirectory);
     }
 
     @Test
@@ -233,7 +331,8 @@ public class TestCMakeServer {
         assertThat(helloResult.supportedProtocolVersions[0].major).isNotNull();
         assertThat(helloResult.supportedProtocolVersions[0].minor).isNotNull();
 
-        HandshakeResult handshakeResult = connection.handshake(getAndroidSharedLibHandshake());
+        HandshakeRequest handshakeRequest = getAndroidSharedLibHandshake();
+        HandshakeResult handshakeResult = connection.handshake(handshakeRequest);
 
         assertThat(handshakeResult.cookie).isNotNull();
         assertThat(handshakeResult.inReplyTo).isNotNull();
@@ -327,6 +426,21 @@ public class TestCMakeServer {
         assertThat(globalSettings.capabilities.version.patch).isNotNull();
         assertThat(globalSettings.capabilities.version.string).isNotNull();
         assertThat(globalSettings.capabilities.version.suffix).isNotNull();
+
+        recordUnique(codemodelReply, handshakeRequest.buildDirectory);
+    }
+
+    private CodeModel recordUnique(CodeModel codemodel, String buildDirectory) throws IOException {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+        String string = gson.toJson(codemodel);
+        string = string.replace(buildDirectory, "${buildDirectory}");
+        File exampleMessages = new File("./example-messages");
+        exampleMessages.mkdir();
+        File outFile = new File(exampleMessages, String.format("codemodel-%s.json", literateHash(string)));
+        com.google.common.io.Files.write(string, outFile, Charsets.UTF_8);
+        return codemodel;
     }
 
     @Test
