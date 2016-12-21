@@ -1,0 +1,60 @@
+{
+  "type": "reply",
+  "cookie": "",
+  "inReplyTo": "codemodel",
+  "configurations": [
+    {
+      "name": "Debug",
+      "projects": [
+        {
+          "buildDirectory": "${buildDirectory}",
+          "name": "Project",
+          "sourceDirectory": "C:/Users/jomof/projects/cmakeserver/test-data/cmake-projects/android-shared-lib",
+          "targets": [
+            {
+              "artifacts": [
+                "${buildDirectory}/libnative-lib.so"
+              ],
+              "buildDirectory": "${buildDirectory}",
+              "fileGroups": [
+                {
+                  "compileFlags": "-g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror\u003dformat-security -fno-exceptions -fno-rtti -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -Wa,--noexecstack -Wformat -Werror\u003dformat-security -fno-exceptions -fno-rtti  -O0 -O0  -fPIC  ",
+                  "isGenerated": false,
+                  "language": "CXX",
+                  "sources": [
+                    "src/main/cpp/native-lib.cpp"
+                  ],
+                  "defines": [
+                    "native_lib_EXPORTS"
+                  ],
+                  "includePath": [
+                    {
+                      "isSystem": true,
+                      "path": "C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/include"
+                    },
+                    {
+                      "isSystem": true,
+                      "path": "C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/include"
+                    },
+                    {
+                      "isSystem": true,
+                      "path": "C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/include/backward"
+                    }
+                  ]
+                }
+              ],
+              "fullName": "libnative-lib.so",
+              "linkLibraries": "-llog -lm \"C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/sources/cxx-stl/gnu-libstdc++/4.9/libs/arm64-v8a/libgnustl_static.a\"",
+              "linkerLanguage": "CXX",
+              "name": "native-lib",
+              "sourceDirectory": "C:/Users/jomof/projects/cmakeserver/test-data/cmake-projects/android-shared-lib",
+              "type": "SHARED_LIBRARY",
+              "linkFlags": "-Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now",
+              "sysroot": "C:/Users/jomof/projects/cmakeserver/prebuilts/android-ndk-r13b/platforms/android-21/arch-arm64"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
