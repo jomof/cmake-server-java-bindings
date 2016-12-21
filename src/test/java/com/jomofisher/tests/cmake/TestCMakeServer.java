@@ -60,7 +60,14 @@ public class TestCMakeServer {
 
     private static String literateHash(Object object) {
         String adjective[] = new String[]{
-                "Deteriorating",
+                "Glassy", "Transparent", "Opaque", "Shimmering", "Sparkling", "Glowing", "Shining", "Honorary",
+                "Soggy", "Killer", "Showy", "Idolized", "Slippery", "Rash", "Corny", "Smelly", "Instable",
+                "Gaseous", "Aqueous", "Understated", "Overstated", "Dwarf", "Lively", "Admired", "Damaged",
+                "Heartfelt", "American", "Half", "Soft", "Wideeyed", "Distant", "Imaginative", "Jolly", "Valuable",
+                "Concerned", "WellOff", "Menacing", "Giant", "Horned", "Enlightened", "Spirited", "Waterlogged",
+                "Deteriorating", "Unknown", "Sparse", "Mad", "Shocked", "Respectful", "Different", "Sarcastic",
+                "Wasteful", "Measly", "Definite", "Exemplary", "Miniature", "Common", "Pointed", "Active",
+                "Bighearted", "Acceptable", "Hidden", "Speedy", "Ashamed", "Occasional", "Tidy", "Admirable",
                 "Walking", "Running", "Sprinting", "Dashing", "Crashing", "Spirited", "Spiritual", "Ancient",
                 "Melting", "Boiling", "Evaporating", "Freezing", "Sublimating", "Triple", "Double", "Quadruple",
                 "Quintuple", "Octo", "Former", "Latter", "Formal", "Decorated", "Hypnotic", "Drunken", "Realizing",
@@ -74,10 +81,13 @@ public class TestCMakeServer {
                 "Figurative", "Folk", "Future", "Geometric", "Gothic", "Typographic", "Lyrical", "Magical", "Maximum",
                 "Minimum", "Modern", "Naive", "Primitive", "Naive", "Objective", "Precision", "Psychedelic",
                 "Regional", "Romantic", "Rococo", "Resonating", "Space", "Symbolic", "Street", "Supreme",
-                "Penultimate", "Ultimate", "Underground", "Baroque"
+                "Penultimate", "Ultimate", "Underground", "Baroque", "Race", "Solar", "Hidden", "Apparent",
+                "High", "Low", "Country"
         };
         String noun[] = new String[]{
-                "Dog", "Cat", "Mountain", "Ocean", "Submarine", "Salamander", "Tree", "Forest", "Rock", "Earth",
+                "Honeyeater", "Dog", "Cat", "Mountain", "Ocean", "Submarine", "Salamander", "Tree", "Forest", "Rock",
+                "Earth", "Burrito", "Guppy", "Fly", "Dowitcher", "All", "Chupacabra", "Rattlesnake", "Butterfly",
+                "Monarch", "Chimney", "Chimneysweep", "Frog", "Bonobo", "Chimpanzee", "SpiderMonkey",
                 "Novel", "Hunter", "Teacher", "Fire", "Tower", "Lamp", "Flame", "Theory", "Love", "People", "History",
                 "World", "Map", "Family", "Door", "Window", "Music", "Bird", "Fact", "Area", "Language", "Rhythm",
                 "Bird", "Worm", "Time", "Year", "Hand", "Night", "Day", "Story", "Chemistry", "Painting", "Cigarette",
@@ -103,14 +113,25 @@ public class TestCMakeServer {
                 "Spaniel", "Azawakh", "Barbet", "Basenji", "Collie", "Malinois", "Tervuren", "Picard", "Frise",
                 "Bolognese", "Boxer", "Briard", "Griffon", "Chihuahua", "Dachshund", "Dalmatian", "Pinscher",
                 "Setter", "Pointer", "Pyrenees", "Harrier", "Havanese", "Keeshond", "Kuvasz", "Labradoodle",
-                "Mutt", "Otterhound", "Papillon", "Pug", "Puli", "Ridgeback", "Rottweiler", "Whippet", "Yorkipoo"
+                "Mutt", "Otterhound", "Papillon", "Pug", "Puli", "Ridgeback", "Rottweiler", "Whippet", "Yorkipoo",
+                "Quarterhourse", "Bovine", "Octopus", "Squid", "Whale", "Dolphin", "Porpoise", "Salmon", "Sailfish",
+                "Penguin", "Shellfish", "Officer", "Firefighter", "Bluetickhound", "Ambush", "Spider", "Scorpion",
+                "Amethyst", "Television", "Radio", "Phone", "Burro", "Storm", "Shower", "Tornado", "Hurricane",
+                "Earthquake", "Tsunami", "Bottle", "Violin", "Flute", "Harp", "Guitar", "Trumpet", "Horn",
+                "Clarinet", "Bassoon", "Orchestra", "Choir", "Club", "Highway", "Road", "Alley", "Skyscraper",
+                "Galaxy", "System", "Lacquer", "Shellac", "Glue", "Tape", "Baseball", "Football", "Tumbler",
+                "Hydrant", "Conduit", "Transistor", "Cheater", "Drifter", "Astronaut", "Cosmonaut", "Reality",
+                "Fantasy", "Elf", "Ork", "Wizard", "Fighter", "Intelligence", "Dexterity", "Strength", "Charisma",
+                "Dungeon", "Treasure", "Crack", "River", "Tributary"
         };
         String verb[] = new String[]{
                 "Runs", "Walks", "Speaks", "Waits", "Learns", "Opens", "Closes", "Calls", "Asks", "Becomes", "Helps",
                 "Plays", "Moves", "Lives", "Writes", "Stands", "Meets", "Continues", "Changes", "Creates", "Speaks",
                 "Grows", "Remembers", "Sends", "Builds", "Reaches", "Raises", "Hopes", "Supports", "Catches",
                 "Delights", "Entrances", "Improves", "Captures", "Befriends", "Elevates", "Erupts", "Raises", "Lowers",
-                "Extends", "Heightens", "Keeps", "Organizes", "Predicts", "Embiggens", "Waltzes", "Tunes"
+                "Extends", "Heightens", "Keeps", "Organizes", "Predicts", "Embiggens", "Waltzes", "Tunes", "Carries",
+                "Reads", "Drives", "Teleports", "Throws", "Hammers", "Drills", "Thrills", "Kills", "Wills", "Bills",
+                "Mills", "Tills", "Fills", "Trills", "Chills"
         };
         StringBuilder hash = new StringBuilder();
         int remainingHash = object.hashCode();
