@@ -2,6 +2,13 @@ language: java
 sudo: false
 matrix:
   include:
+  - os: linux
+    jdk: jdk7
+    before_script:
+      - wget https://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
+      - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
+    script:
+      - ./gradlew assemble check --info
   # Run against a CMake nightly
   - os: linux
     dist: trusty
@@ -14,15 +21,6 @@ matrix:
       - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
     script:
       - ./gradlew assemble check
-
-  - os: linux
-    jdk: jdk7
-    before_script:
-      - wget https://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip
-      - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
-    script:
-      - ./gradlew assemble check --info
-
   - os: linux
     jdk: oraclejdk8
     before_script:
