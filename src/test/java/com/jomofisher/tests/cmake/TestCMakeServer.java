@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jomofisher.cmake.CMake;
 import com.jomofisher.cmake.serverv1.*;
+import com.jomofisher.literatehash.LiterateHash;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -52,111 +53,12 @@ public class TestCMakeServer {
         }
     }
 
-    private static int modAppend(String[] keys, StringBuilder hash, int remainingHash) {
-        int keySize = keys.length;
-        hash.append(keys[remainingHash % keySize]);
-        return remainingHash / keySize;
-    }
-
-    private static String literateHash(Object object) {
-        String adjective[] = new String[]{
-                "Glassy", "Transparent", "Opaque", "Shimmering", "Sparkling", "Glowing", "Shining", "Honorary",
-                "Soggy", "Killer", "Showy", "Idolized", "Slippery", "Rash", "Corny", "Smelly", "Instable",
-                "Gaseous", "Aqueous", "Understated", "Overstated", "Dwarf", "Lively", "Admired", "Damaged",
-                "Heartfelt", "American", "Half", "Soft", "Wideeyed", "Distant", "Imaginative", "Jolly", "Valuable",
-                "Concerned", "WellOff", "Menacing", "Giant", "Horned", "Enlightened", "Spirited", "Waterlogged",
-                "Deteriorating", "Unknown", "Sparse", "Mad", "Shocked", "Respectful", "Different", "Sarcastic",
-                "Wasteful", "Measly", "Definite", "Exemplary", "Miniature", "Common", "Pointed", "Active",
-                "Bighearted", "Acceptable", "Hidden", "Speedy", "Ashamed", "Occasional", "Tidy", "Admirable",
-                "Walking", "Running", "Sprinting", "Dashing", "Crashing", "Spirited", "Spiritual", "Ancient",
-                "Melting", "Boiling", "Evaporating", "Freezing", "Sublimating", "Triple", "Double", "Quadruple",
-                "Quintuple", "Octo", "Former", "Latter", "Formal", "Decorated", "Hypnotic", "Drunken", "Realizing",
-                "Gaseous", "Grassy", "Sandy", "Rocky", "Gigantic", "Hilarious", "Hard", "Soft", "Curious", "Rigid",
-                "Adorable", "Clean", "Elegant", "Turquoise", "Blue", "Green", "Famous", "Gifted", "Thankful",
-                "Brave", "Calm", "Mysterious", "Round", "Square", "Massive", "Faint", "Melodic", "Tall", "Ancient",
-                "Brief", "Swift", "Whispering", "Salty", "Weak", "Inspirational", "Cellar", "Better", "Best", "Early",
-                "Important", "Wild", "Swamp", "Arboreal", "Jungle", "Molten", "Frozen", "Aromatic", "Zippy", "Zesty",
-                "Comfortable", "Cozy", "Abstract", "Surreal", "Impressionist", "Cubist", "Fauvist", "Dadaist", "Pop",
-                "Nouveau", "Aesthetic", "Real", "Concrete", "Conceptual", "Deconstructed", "Digital", "Fantastic",
-                "Figurative", "Folk", "Future", "Geometric", "Gothic", "Typographic", "Lyrical", "Magical", "Maximum",
-                "Minimum", "Modern", "Naive", "Primitive", "Naive", "Objective", "Precision", "Psychedelic",
-                "Regional", "Romantic", "Rococo", "Resonating", "Space", "Symbolic", "Street", "Supreme",
-                "Penultimate", "Ultimate", "Underground", "Baroque", "Race", "Solar", "Hidden", "Apparent",
-                "High", "Low", "Country"
-        };
-        String noun[] = new String[]{
-                "Honeyeater", "Dog", "Cat", "Mountain", "Ocean", "Submarine", "Salamander", "Tree", "Forest", "Rock",
-                "Earth", "Burrito", "Guppy", "Fly", "Dowitcher", "All", "Chupacabra", "Rattlesnake", "Butterfly",
-                "Monarch", "Chimney", "Chimneysweep", "Frog", "Bonobo", "Chimpanzee", "SpiderMonkey",
-                "Novel", "Hunter", "Teacher", "Fire", "Tower", "Lamp", "Flame", "Theory", "Love", "People", "History",
-                "World", "Map", "Family", "Door", "Window", "Music", "Bird", "Fact", "Area", "Language", "Rhythm",
-                "Bird", "Worm", "Time", "Year", "Hand", "Night", "Day", "Story", "Chemistry", "Painting", "Cigarette",
-                "Scene", "Mood", "Expression", "Foundation", "Grandfather", "Hope", "Selection", "Wine", "Passion",
-                "Happiness", "Republic", "Engine", "Hotel", "Motorcycle", "Leader", "Cousin", "Flute", "Piano",
-                "Beetle", "Spider", "Lion", "Snake", "Fish", "Shark", "Whale", "Ship", "Capsule", "Travel", "Train",
-                "Range", "Locus", "Pentagon", "Polygon", "Sphere", "Pyramid", "Tide", "Wheel", "Tire", "Engine",
-                "Seat", "Rose", "Tulip", "Azalea", "Chest", "Blouse", "Tiger", "Cube", "Scorpion", "Fox", "Sandwich",
-                "Taco", "Poem", "Novel", "Candle", "Sketch", "Painting", "Vine", "Ceramic", "Bowl", "Plate", "Spoon",
-                "Fork", "Hammock", "Cable", "Wire", "Diamond", "Ruby", "Emerald", "Comet", "Planet", "Star", "Moon",
-                "Rocket", "Sled", "Table", "Couch", "Bed", "Room", "Basket", "Box", "Envelope", "Robe", "Silk",
-                "Terrier", "Shepherd", "Sheep", "Cow", "Corgi", "Hill", "Lake", "Pond", "Mountain", "Plateau",
-                "Grocer", "Horse", "Bicycle", "Helmet", "Turtle", "Moose", "Mine", "Cave", "Core", "Snow", "Angel",
-                "Cactus", "Elephant", "Hippo", "Zippo", "Cigar", "Eagle", "Hawk", "Raptor", "Dinosaur", "Vegetable",
-                "Carrot", "Celery", "Gerbil", "Rabbit", "Pig", "Mouse", "Paintbrush", "Easel", "Shoe", "Sock",
-                "Wall", "Roof", "Drawer", "Straw", "Wick", "Gasoline", "Kerosene", "Blanket", "Pillow", "Musician",
-                "Artist", "Poet", "Chiclet", "Physics", "Chemistry", "Anatomy", "Astrobiology", "Biochemistry",
-                "Biogeography", "Biophysics", "Neuroscience", "Biotechnology", "Botany", "Cryobiology",
-                "Ecology", "Ethnobiology", "Gerontology", "Immunology", "Limnology", "Microbiology", "Neuroscience",
-                "Paleontology", "Parasitology", "Physiology", "Radiobiology", "Sociobiology", "Toxicology", "Zoology",
-                "Carnation", "Lily", "Thistle", "Orchid", "Sunflower", "Snapdragon", "Lavender", "Holly", "Peony",
-                "Marigold", "Lilac", "Ginger", "Aster", "Bloom", "Bell", "Corn", "Wheat", "Hound", "Akita", "Malamute",
-                "Spaniel", "Azawakh", "Barbet", "Basenji", "Collie", "Malinois", "Tervuren", "Picard", "Frise",
-                "Bolognese", "Boxer", "Briard", "Griffon", "Chihuahua", "Dachshund", "Dalmatian", "Pinscher",
-                "Setter", "Pointer", "Pyrenees", "Harrier", "Havanese", "Keeshond", "Kuvasz", "Labradoodle",
-                "Mutt", "Otterhound", "Papillon", "Pug", "Puli", "Ridgeback", "Rottweiler", "Whippet", "Yorkipoo",
-                "Quarterhourse", "Bovine", "Octopus", "Squid", "Whale", "Dolphin", "Porpoise", "Salmon", "Sailfish",
-                "Penguin", "Shellfish", "Officer", "Firefighter", "Bluetickhound", "Ambush", "Spider", "Scorpion",
-                "Amethyst", "Television", "Radio", "Phone", "Burro", "Storm", "Shower", "Tornado", "Hurricane",
-                "Earthquake", "Tsunami", "Bottle", "Violin", "Flute", "Harp", "Guitar", "Trumpet", "Horn",
-                "Clarinet", "Bassoon", "Orchestra", "Choir", "Club", "Highway", "Road", "Alley", "Skyscraper",
-                "Galaxy", "System", "Lacquer", "Shellac", "Glue", "Tape", "Baseball", "Football", "Tumbler",
-                "Hydrant", "Conduit", "Transistor", "Cheater", "Drifter", "Astronaut", "Cosmonaut", "Reality",
-                "Fantasy", "Elf", "Ork", "Wizard", "Fighter", "Intelligence", "Dexterity", "Strength", "Charisma",
-                "Dungeon", "Treasure", "Crack", "River", "Tributary"
-        };
-        String verb[] = new String[]{
-                "Runs", "Walks", "Speaks", "Waits", "Learns", "Opens", "Closes", "Calls", "Asks", "Becomes", "Helps",
-                "Plays", "Moves", "Lives", "Writes", "Stands", "Meets", "Continues", "Changes", "Creates", "Speaks",
-                "Grows", "Remembers", "Sends", "Builds", "Reaches", "Raises", "Hopes", "Supports", "Catches",
-                "Delights", "Entrances", "Improves", "Captures", "Befriends", "Elevates", "Erupts", "Raises", "Lowers",
-                "Extends", "Heightens", "Keeps", "Organizes", "Predicts", "Embiggens", "Waltzes", "Tunes", "Carries",
-                "Reads", "Drives", "Teleports", "Throws", "Hammers", "Drills", "Thrills", "Kills", "Wills", "Bills",
-                "Mills", "Tills", "Fills", "Trills", "Chills"
-        };
-        StringBuilder hash = new StringBuilder();
-        int remainingHash = object.hashCode();
-        if (remainingHash < 0) {
-            remainingHash *= -1;
-            remainingHash = modAppend(noun, hash, remainingHash);
-            remainingHash = modAppend(verb, hash, remainingHash);
-        }
-        while (remainingHash > 1) {
-            remainingHash = modAppend(adjective, hash, remainingHash);
-            if (remainingHash > 0) {
-                remainingHash = modAppend(noun, hash, remainingHash);
-            }
-            if (remainingHash > 0) {
-                remainingHash = modAppend(verb, hash, remainingHash);
-            }
-        }
-        return hash.toString();
-    }
 
     private File getTemporaryBuildOutputFolder() throws IOException {
         Path basedir = FileSystems.getDefault().getPath("test-output").toAbsolutePath();
         basedir.toFile().mkdirs();
         return new File(basedir.toFile(), String.format("build-output-%s",
-                literateHash(new Random().nextLong())));
+                LiterateHash.of(new Random().nextLong())));
     }
 
     private File getWorkspaceFolder() {
@@ -458,7 +360,8 @@ public class TestCMakeServer {
         string = string.replace(buildDirectory, "${buildDirectory}");
         File exampleMessages = new File("./example-messages");
         exampleMessages.mkdir();
-        File outFile = new File(exampleMessages, String.format("codemodel-%s.json", literateHash(string)));
+        File outFile = new File(exampleMessages, String.format("codemodel-%s.json",
+                LiterateHash.of(string)));
         com.google.common.io.Files.write(string, outFile, Charsets.UTF_8);
         return codemodel;
     }
