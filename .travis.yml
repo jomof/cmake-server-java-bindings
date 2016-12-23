@@ -9,6 +9,8 @@ matrix:
       - unzip android-ndk-r13b-linux-x86_64.zip -d prebuilts/ > nul
     script:
       - ./gradlew assemble check --info
+    after_success:
+      - bash <(curl -s https://codecov.io/bash)
   # Run against a CMake nightly
   - os: linux
     dist: trusty
