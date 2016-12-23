@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/jomof/cmake-server-java-bindings.svg?branch=master)](https://travis-ci.org/jomof/cmake-server-java-bindings)
-[![](https://jitpack.io/v/jomof/cmake-server-java-bindings.svg)](https://jitpack.io/#jomof/cmake-server-java-bindings)
+[![](https://jitpack.io/v/com.jomofisher/cmake-server-java-bindings.svg)](https://jitpack.io/#com.jomofisher/cmake-server-java-bindings)
+[![codecov](https://codecov.io/gh/jomof/cmake-server-java-bindings/branch/master/graph/badge.svg)](https://codecov.io/gh/jomof/cmake-server-java-bindings)
 
 # CMake Server Java Bindings
 Creates java bindings for CMake Server. Example usage,
