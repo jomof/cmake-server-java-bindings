@@ -65,6 +65,19 @@ public class TestCMakeServer {
         return new File(".").getAbsoluteFile();
     }
 
+    private File getAndroidStudioCMakeExecutable() {
+        switch (detectedOS) {
+            case Linux:
+                return new File("./prebuilts/android-studio-cmake-3.6.3155560-linux-x86_64/bin/cmake");
+            case Windows:
+                return new File("./prebuilts/android-studio-cmake-3.6.3155560-windows-x86_64/bin/cmake.exe");
+            case MacOS:
+                return new File("./prebuilts/android-studio-cmake-3.6.3155560-darwin-x86_64/bin/cmake");
+            default:
+                throw new RuntimeException("OS not yet supported: " + detectedOS);
+        }
+    }
+
     private File getCMakeInstallFolder() {
         String cmakeName = System.getenv().get("TARGET_CMAKE_NAME");
         if (cmakeName == null) {
@@ -239,6 +252,57 @@ public class TestCMakeServer {
         ComputeResult computeResult = connection.compute();
         CodeModel codemodelReply = connection.codemodel();
         recordUnique(codemodelReply, handshakeRequest.buildDirectory);
+    }
+
+    @Test
+    public void testAndroidStudioCMakeExecutableExists() {
+        assertThat(getAndroidStudioCMakeExecutable().isFile()).isTrue();
+    }
+
+    @Test
+    public void testAndroidCodeModelAgainstAndroidStudio() throws Exception {
+        ServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
+        HelloResult helloResult = connection.getConnectionHelloResult();
+
+        HandshakeRequest handshakeRequest = getAndroidSharedLibHandshake();
+        HandshakeResult handshakeResult = connection.handshake(handshakeRequest);
+        ConfigureResult configureResult = connection.configure(
+                "-DANDROID_ABI=arm64-v8a",
+                "-DANDROID_NDK=prebuilts\\android-ndk-r13b",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                String.format("-DCMAKE_TOOLCHAIN_FILE=%s\\prebuilts\\android-ndk-r13b\\build\\cmake\\android.toolchain.cmake",
+                        new File(".").getAbsolutePath()),
+                "-DANDROID_NATIVE_API_LEVEL=21",
+                "-DANDROID_TOOLCHAIN=gcc",
+                "-DCMAKE_CXX_FLAGS=");
+//
+//        ComputeResult computeResult = connection.compute();
+//        CodeModel codemodelReply = connection.codemodel();
+//
+//        // Call Android Studio fork of CMake to get android_gradle.json
+//        ProcessBuilder processBuilder;
+//
+//        if (System.getProperty("os.name").contains("Windows")) {
+//
+//            processBuilder = new ProcessBuilder(String.format("%s\\cmake",
+//                    this.builder.getCmakeInstallPath()),
+//                    "-E", "server", "--experimental", "--debug");
+//        } else {
+//            processBuilder = new ProcessBuilder(String.format("%s/cmake",
+//                    this.builder.getCmakeInstallPath()),
+//                    "-E", "server", "--experimental", "--debug");
+//        }
+//
+//        processBuilder.environment().putAll(builder.environment());
+//        Process process = processBuilder.start();
+//
+//        input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+//        output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+//        CMake androidStudioCMake = new CMake(new File(String.format(
+//                "%s\\prebuilts\\cmake-3.7.1-Windows-x86_64\\bin\\cmake.exe",
+//                new File(".").getAbsolutePath())));
+//
+
     }
 
     @Test
