@@ -308,6 +308,7 @@ public class TestCMakeServer {
         setUpCmakeEnvironment(processBuilder.environment());
         Process process = processBuilder.start();
         process.waitFor();
+        Thread.sleep(1000);
 
         File androidGradleBuildJson = new File(androidStudioBuildDirectory, "android_gradle_build.json");
 //        assertThat(androidGradleBuildJson.isFile())
