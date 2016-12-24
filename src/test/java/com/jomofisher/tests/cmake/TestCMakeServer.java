@@ -330,14 +330,15 @@ public class TestCMakeServer {
         assertThat(process.waitFor()).named("Android CMake process").isEqualTo(0);
 
         File androidGradleBuildJson = new File(androidStudioBuildDirectory, "android_gradle_build.json");
-//        assertThat(androidGradleBuildJson.isFile())
-//                .named(androidGradleBuildJson.getAbsolutePath())
-//                .isTrue();
+        assertThat(androidGradleBuildJson.isFile())
+                .named(androidGradleBuildJson.getAbsolutePath())
+                .isTrue();
         String androidGradleBuildText = new String(Files.readAllBytes(androidGradleBuildJson.toPath()));
         Gson gson = new GsonBuilder()
                 .create();
-        //AndroidGradleBuild androidGradleBuild = gson.fromJson(androidGradleBuildText, AndroidGradleBuild.class);
+        AndroidGradleBuild androidGradleBuild = gson.fromJson(androidGradleBuildText, AndroidGradleBuild.class);
         JsonUtils.checkForExtraFields(androidGradleBuildText, AndroidGradleBuild.class);
+        recordUnique(codemodelReply, androidGradleBuild, handshakeRequest.buildDirectory, androidStudioBuildDirectory);
     }
 
     @Test
@@ -462,6 +463,31 @@ public class TestCMakeServer {
         File outFile = new File(exampleMessages, String.format("codemodel-%s.json",
                 LiterateHash.of(string)));
         com.google.common.io.Files.write(string, outFile, Charsets.UTF_8);
+        return codemodel;
+    }
+
+    private CodeModel recordUnique(
+            CodeModel codemodel,
+            AndroidGradleBuild build,
+            String buildDirectory1,
+            String buildDirectory2) throws IOException {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+        String string = gson.toJson(codemodel);
+        string = string.replace(buildDirectory1, "${buildDirectory}");
+        File exampleMessages = new File("./example-messages");
+        exampleMessages.mkdir();
+
+        String hash = LiterateHash.of(string);
+        com.google.common.io.Files.write(string, new File(exampleMessages, String.format("codemodel-%s.json",
+                hash)), Charsets.UTF_8);
+
+        string = gson.toJson(build);
+        string = string.replace(buildDirectory2, "${buildDirectory}");
+        com.google.common.io.Files.write(string,
+                new File(exampleMessages, String.format("android-studio-%s.json",
+                        hash)), Charsets.UTF_8);
         return codemodel;
     }
 
