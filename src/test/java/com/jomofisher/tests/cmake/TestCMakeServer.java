@@ -272,6 +272,10 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidCodeModelAgainstAndroidStudio() throws Exception {
+
+        if ("1".equals(System.getenv().get("NO_ANDROID_STUDIO_CMAKE_ON_THIS_OS"))) {
+            return;
+        }
         ServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
         HelloResult helloResult = connection.getConnectionHelloResult();
 
