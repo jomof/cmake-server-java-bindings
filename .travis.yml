@@ -11,6 +11,7 @@ matrix:
       - ./gradlew assemble check jacocoTestReport --info
     after_success:
       - bash <(curl -s https://codecov.io/bash)
+      
   # Run against a CMake nightly
   - os: linux
     dist: trusty
