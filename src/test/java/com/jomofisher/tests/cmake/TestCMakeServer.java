@@ -313,9 +313,9 @@ public class TestCMakeServer {
         BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = in.readLine()) != null) {
-            System.out.println("android-studio-out: " + line);
+            System.err.println("android-studio-out: " + line);
         }
-        assertThat(process.waitFor()).named("Android CMake process").isSameAs(0);
+        assertThat(process.waitFor()).named("Android CMake process").isEqualTo(0);
         Thread.sleep(1000);
 
         File androidGradleBuildJson = new File(androidStudioBuildDirectory, "android_gradle_build.json");
