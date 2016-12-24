@@ -293,6 +293,9 @@ public class TestCMakeServer {
 
         // Call Android Studio fork of CMake to get android_gradle.json
         String androidStudioBuildDirectory = getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/');
+        assertThat(getAndroidStudioCMakeExecutable().isFile())
+                .named(getAndroidStudioCMakeExecutable().getAbsolutePath())
+                .isTrue();
         ProcessBuilder processBuilder = new ProcessBuilder(
                 getAndroidStudioCMakeExecutable().getAbsolutePath(),
                 "-H" + handshakeRequest.sourceDirectory,
@@ -310,13 +313,15 @@ public class TestCMakeServer {
         setUpCmakeEnvironment(processBuilder.environment());
         processBuilder.redirectErrorStream();
         Process process = processBuilder.start();
+        Thread.sleep(1000);
         BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
+        System.err.println("android-studio-out: before");
         while ((line = in.readLine()) != null) {
             System.err.println("android-studio-out: " + line);
         }
+        System.err.println("android-studio-out: after");
         assertThat(process.waitFor()).named("Android CMake process").isEqualTo(0);
-        Thread.sleep(1000);
 
         File androidGradleBuildJson = new File(androidStudioBuildDirectory, "android_gradle_build.json");
 //        assertThat(androidGradleBuildJson.isFile())
