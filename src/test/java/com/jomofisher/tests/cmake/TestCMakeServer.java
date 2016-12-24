@@ -21,6 +21,7 @@ import com.google.gson.GsonBuilder;
 import com.jomofisher.cmake.CMake;
 import com.jomofisher.cmake.serverv1.*;
 import com.jomofisher.literatehash.LiterateHash;
+import com.jomofisher.tests.cmake.model.AndroidGradleBuild;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -28,6 +29,7 @@ import org.junit.runners.JUnit4;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
@@ -308,8 +310,14 @@ public class TestCMakeServer {
         process.waitFor();
 
         File androidGradleBuildJson = new File(androidStudioBuildDirectory, "android_gradle_build.json");
-        assertThat(androidGradleBuildJson.isFile());
-
+        assertThat(androidGradleBuildJson.isFile())
+                .named(androidGradleBuildJson.getAbsolutePath())
+                .isTrue();
+        String androidGradleBuildText = new String(Files.readAllBytes(androidGradleBuildJson.toPath()));
+        Gson gson = new GsonBuilder()
+                .create();
+        //AndroidGradleBuild androidGradleBuild = gson.fromJson(androidGradleBuildText, AndroidGradleBuild.class);
+        JsonUtils.checkForExtraFields(androidGradleBuildText, AndroidGradleBuild.class);
     }
 
     @Test
