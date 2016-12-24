@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'jacoco'
 
 group 'jomofisher'
 if (System.getenv()["TRAVIS_TAG"] != null) {
@@ -36,6 +37,12 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourcesJar
     archives javadocJar
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
 }
 
 dependencies {
