@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -123,18 +124,22 @@ public class TestCMakeServer {
         return getConnectionBuilder(getCMakeInstallFolder());
     }
 
-    private ServerConnectionBuilder getConnectionBuilder(File cmakeInstallFolder) {
-        CMake cmake = new CMake(cmakeInstallFolder);
+    private void setUpCmakeEnvironment(Map<String, String> environment) {
         // Add prebuilts ninja to the install path
         if (detectedOS == OSType.Windows) {
-            String path = getNinjaInstallFolder() + ";" + cmake.environment().get("Path");
+            String path = getNinjaInstallFolder() + ";" + environment.get("Path");
             // Put gcc on the path
             path = "c:\\tools\\msys64\\usr\\bin;" + path;
-            cmake.environment().put("Path", path);
+            environment.put("Path", path);
         } else {
-            String path = getNinjaInstallFolder() + ":" + cmake.environment().get("PATH");
-            cmake.environment().put("PATH", path);
+            String path = getNinjaInstallFolder() + ":" + environment.get("PATH");
+            environment.put("PATH", path);
         }
+    }
+
+    private ServerConnectionBuilder getConnectionBuilder(File cmakeInstallFolder) {
+        CMake cmake = new CMake(cmakeInstallFolder);
+        setUpCmakeEnvironment(cmake.environment());
 
         return cmake.newServerBuilder()
                 .setDeserializationMonitor(new DeserializationMonitor() {
@@ -266,42 +271,42 @@ public class TestCMakeServer {
 
         HandshakeRequest handshakeRequest = getAndroidSharedLibHandshake();
         HandshakeResult handshakeResult = connection.handshake(handshakeRequest);
+        String toolChain = new File("prebuilts/android-ndk-r13b/build/cmake/android.toolchain.cmake")
+                .getAbsolutePath();
         ConfigureResult configureResult = connection.configure(
                 "-DANDROID_ABI=arm64-v8a",
                 "-DANDROID_NDK=prebuilts\\android-ndk-r13b",
                 "-DCMAKE_BUILD_TYPE=Debug",
-                String.format("-DCMAKE_TOOLCHAIN_FILE=%s\\prebuilts\\android-ndk-r13b\\build\\cmake\\android.toolchain.cmake",
-                        new File(".").getAbsolutePath()),
+                "-DCMAKE_TOOLCHAIN_FILE=" + toolChain,
                 "-DANDROID_NATIVE_API_LEVEL=21",
                 "-DANDROID_TOOLCHAIN=gcc",
                 "-DCMAKE_CXX_FLAGS=");
-//
-//        ComputeResult computeResult = connection.compute();
-//        CodeModel codemodelReply = connection.codemodel();
-//
-//        // Call Android Studio fork of CMake to get android_gradle.json
-//        ProcessBuilder processBuilder;
-//
-//        if (System.getProperty("os.name").contains("Windows")) {
-//
-//            processBuilder = new ProcessBuilder(String.format("%s\\cmake",
-//                    this.builder.getCmakeInstallPath()),
-//                    "-E", "server", "--experimental", "--debug");
-//        } else {
-//            processBuilder = new ProcessBuilder(String.format("%s/cmake",
-//                    this.builder.getCmakeInstallPath()),
-//                    "-E", "server", "--experimental", "--debug");
-//        }
-//
-//        processBuilder.environment().putAll(builder.environment());
-//        Process process = processBuilder.start();
-//
-//        input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-//        output = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-//        CMake androidStudioCMake = new CMake(new File(String.format(
-//                "%s\\prebuilts\\cmake-3.7.1-Windows-x86_64\\bin\\cmake.exe",
-//                new File(".").getAbsolutePath())));
-//
+
+        ComputeResult computeResult = connection.compute();
+        CodeModel codemodelReply = connection.codemodel();
+
+        // Call Android Studio fork of CMake to get android_gradle.json
+        String androidStudioBuildDirectory = getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/');
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                getAndroidStudioCMakeExecutable().getAbsolutePath(),
+                "-H" + handshakeRequest.sourceDirectory,
+                "-B" + androidStudioBuildDirectory,
+                "-GAndroid Gradle - Ninja",
+                "-DANDROID_ABI=arm64-v8a",
+                "-DANDROID_NDK=prebuilts\\android-ndk-r13b",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_MAKE_PROGRAM=" + getNinjaInstallFolder().getAbsolutePath() + "/ninja",
+                "-DCMAKE_TOOLCHAIN_FILE=" + toolChain,
+                "-DANDROID_NATIVE_API_LEVEL=21",
+                "-DANDROID_TOOLCHAIN=gcc",
+                "-DCMAKE_CXX_FLAGS=");
+
+        setUpCmakeEnvironment(processBuilder.environment());
+        Process process = processBuilder.start();
+        process.waitFor();
+
+        File androidGradleBuildJson = new File(androidStudioBuildDirectory, "android_gradle_build.json");
+        assertThat(androidGradleBuildJson.isFile());
 
     }
 
