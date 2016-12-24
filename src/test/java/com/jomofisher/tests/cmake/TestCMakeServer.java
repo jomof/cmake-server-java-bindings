@@ -261,7 +261,9 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidStudioCMakeExecutableExists() {
-        assertThat(getAndroidStudioCMakeExecutable().isFile()).isTrue();
+        assertThat(getAndroidStudioCMakeExecutable().isFile())
+                .named(getAndroidStudioCMakeExecutable().getAbsolutePath())
+                .isTrue();
     }
 
     @Test
