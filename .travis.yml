@@ -47,7 +47,7 @@ matrix:
       - unzip android-ndk-r13b-darwin-x86_64.zip -d prebuilts/ > nul
       - wget https://dl.google.com/android/repository/cmake-3.6.3155560-darwin-x86_64.zip
       - unzip cmake-3.6.3155560-darwin-x86_64.zip -d prebuilts/android-studio-cmake-3.6.3155560-darwin-x86_64/
-      - prebuilts/android-studio-cmake-3.6.3155560-darwin-x86_64/cmake --version
+      - prebuilts/android-studio-cmake-3.6.3155560-darwin-x86_64/bin/cmake --version
     script:
       - ./gradlew assemble check
 
