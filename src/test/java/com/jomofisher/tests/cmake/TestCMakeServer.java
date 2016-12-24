@@ -265,6 +265,9 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidStudioCMakeExecutableExists() {
+        if ("1".equals(System.getenv().get("NO_ANDROID_STUDIO_CMAKE_ON_THIS_OS"))) {
+            return;
+        }
         assertThat(getAndroidStudioCMakeExecutable().isFile())
                 .named(getAndroidStudioCMakeExecutable().getAbsolutePath())
                 .isTrue();
