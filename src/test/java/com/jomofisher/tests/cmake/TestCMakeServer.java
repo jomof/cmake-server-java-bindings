@@ -319,7 +319,6 @@ public class TestCMakeServer {
         setUpCmakeEnvironment(processBuilder.environment());
         processBuilder.redirectErrorStream();
         Process process = processBuilder.start();
-        Thread.sleep(1000);
         BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         System.err.println("android-studio-out: before");
@@ -339,6 +338,15 @@ public class TestCMakeServer {
         AndroidGradleBuild androidGradleBuild = gson.fromJson(androidGradleBuildText, AndroidGradleBuild.class);
         JsonUtils.checkForExtraFields(androidGradleBuildText, AndroidGradleBuild.class);
         recordUnique(codemodelReply, androidGradleBuild, handshakeRequest.buildDirectory, androidStudioBuildDirectory);
+
+        // Translate codeModel into android studio model
+        AndroidGradleBuild translated = AndroidGradleBuild.of(
+                codemodelReply,
+                getAndroidStudioCMakeExecutable().getAbsolutePath(),
+                "arm64-v8a"
+
+
+        );
     }
 
     @Test
@@ -485,6 +493,7 @@ public class TestCMakeServer {
 
         string = gson.toJson(build);
         string = string.replace(buildDirectory2, "${buildDirectory}");
+        string = string.replace(buildDirectory2.replace("/", "\\\\"), "${buildDirectory}");
         com.google.common.io.Files.write(string,
                 new File(exampleMessages, String.format("android-studio-%s.json",
                         hash)), Charsets.UTF_8);

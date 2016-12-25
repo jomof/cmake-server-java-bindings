@@ -3,7 +3,7 @@
     "C:/Users/jomof/projects/cmakeserver/test-data/cmake-projects/android-shared-lib/CMakeLists.txt"
   ],
   "cleanCommands": [
-    "C:\\Users\\jomof\\projects\\cmakeserver\\prebuilts\\android-studio-cmake-3.6.3155560-windows-x86_64\\bin\\cmake.exe --build C:\\Users\\jomof\\projects\\cmakeserver\\test-output\\build-output-PhysicsDelightsGothicHound --target clean"
+    "C:\\Users\\jomof\\projects\\cmakeserver\\prebuilts\\android-studio-cmake-3.6.3155560-windows-x86_64\\bin\\cmake.exe --build ${buildDirectory} --target clean"
   ],
   "cppFileExtensions": [
     "cpp"
@@ -12,7 +12,7 @@
     "native-lib-Debug-arm64-v8a": {
       "abi": "arm64-v8a",
       "artifactName": "native-lib",
-      "buildCommand": "C:\\Users\\jomof\\projects\\cmakeserver\\prebuilts\\android-studio-cmake-3.6.3155560-windows-x86_64\\bin\\cmake.exe --build C:\\Users\\jomof\\projects\\cmakeserver\\test-output\\build-output-PhysicsDelightsGothicHound --target native-lib",
+      "buildCommand": "C:\\Users\\jomof\\projects\\cmakeserver\\prebuilts\\android-studio-cmake-3.6.3155560-windows-x86_64\\bin\\cmake.exe --build ${buildDirectory} --target native-lib",
       "buildType": "debug",
       "files": [
         {
