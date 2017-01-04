@@ -9,7 +9,7 @@
         {
           "buildDirectory": "${buildDirectory}",
           "name": "hello",
-          "sourceDirectory": "C:/Users/jomof/projects/cmakeserver/test-data/cmake-projects/hello-world",
+          "sourceDirectory": "${sourceDirectory}",
           "targets": [
             {
               "artifacts": [
@@ -31,7 +31,7 @@
               "fullName": "hello.exe",
               "linkerLanguage": "CXX",
               "name": "hello",
-              "sourceDirectory": "C:/Users/jomof/projects/cmakeserver/test-data/cmake-projects/hello-world",
+              "sourceDirectory": "${sourceDirectory}",
               "type": "EXECUTABLE"
             }
           ]

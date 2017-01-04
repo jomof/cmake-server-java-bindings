@@ -204,9 +204,10 @@ public class TestCMakeServer {
         HandshakeRequest message = new HandshakeRequest();
         message.cookie = "my-cookie";
         message.generator = "Ninja";
-        message.sourceDirectory = new File(getSampleProjectsFolder(), "hello-world")
+        message.sourceDirectory = new File(getSampleProjectsFolder(), "hello-world").getCanonicalFile()
                 .getAbsolutePath().replace('\\', '/');
-        message.buildDirectory = getTemporaryBuildOutputFolder().getAbsolutePath().replace('\\', '/');
+        message.buildDirectory = getTemporaryBuildOutputFolder().getCanonicalFile()
+                .getAbsolutePath().replace('\\', '/');
         ProtocolVersion version = new ProtocolVersion();
         version.major = 1;
         message.protocolVersion = version;
@@ -260,7 +261,7 @@ public class TestCMakeServer {
         connection.configure();
         ComputeResult computeResult = connection.compute();
         CodeModel codemodelReply = connection.codemodel();
-        recordUnique(codemodelReply, handshakeRequest.buildDirectory);
+        recordUnique(codemodelReply, handshakeRequest.buildDirectory, handshakeRequest.sourceDirectory);
     }
 
     @Test
@@ -339,7 +340,8 @@ public class TestCMakeServer {
                 .create();
         AndroidGradleBuild androidGradleBuild = gson.fromJson(androidGradleBuildText, AndroidGradleBuild.class);
         JsonUtils.checkForExtraFields(androidGradleBuildText, AndroidGradleBuild.class);
-        recordUnique(codemodelReply, androidGradleBuild, handshakeRequest.buildDirectory, androidStudioBuildDirectory);
+        recordUnique(codemodelReply, androidGradleBuild, handshakeRequest.buildDirectory, androidStudioBuildDirectory,
+                handshakeRequest.sourceDirectory);
 
         // Translate codeModel into android studio model
         AndroidGradleBuild translated = AndroidGradleBuild.of(
@@ -460,15 +462,26 @@ public class TestCMakeServer {
         assertThat(globalSettings.capabilities.version.string).isNotNull();
         assertThat(globalSettings.capabilities.version.suffix).isNotNull();
 
-        recordUnique(codemodelReply, handshakeRequest.buildDirectory);
+        recordUnique(codemodelReply, handshakeRequest.buildDirectory, handshakeRequest.sourceDirectory);
     }
 
-    private CodeModel recordUnique(CodeModel codemodel, String buildDirectory) throws IOException {
+    private String replaceWithSlashCombinations(String string, String search, String replace) {
+        string = string.replace(search, replace);
+        string = string.replace(search.replace("/", "\\\\"), replace);
+        string = string.replace(search.replace("\\\\", "/"), replace);
+        return string;
+    }
+
+    private CodeModel recordUnique(
+            CodeModel codemodel,
+            String buildDirectory,
+            String sourceDirectory) throws IOException {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
         String string = gson.toJson(codemodel);
-        string = string.replace(buildDirectory, "${buildDirectory}");
+        string = replaceWithSlashCombinations(string, buildDirectory, "${buildDirectory}");
+        string = replaceWithSlashCombinations(string, sourceDirectory, "${sourceDirectory}");
         File exampleMessages = new File("./example-messages");
         exampleMessages.mkdir();
         File outFile = new File(exampleMessages, String.format("codemodel-%s.json",
@@ -481,12 +494,14 @@ public class TestCMakeServer {
             CodeModel codemodel,
             AndroidGradleBuild build,
             String buildDirectory1,
-            String buildDirectory2) throws IOException {
+            String buildDirectory2,
+            String sourceDirectory) throws IOException {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .create();
         String string = gson.toJson(codemodel);
-        string = string.replace(buildDirectory1, "${buildDirectory}");
+        string = replaceWithSlashCombinations(string, buildDirectory1, "${buildDirectory}");
+        string = replaceWithSlashCombinations(string, sourceDirectory, "${sourceDirectory}");
         File exampleMessages = new File("./example-messages");
         exampleMessages.mkdir();
 
@@ -495,8 +510,8 @@ public class TestCMakeServer {
                 hash)), Charsets.UTF_8);
 
         string = gson.toJson(build);
-        string = string.replace(buildDirectory2, "${buildDirectory}");
-        string = string.replace(buildDirectory2.replace("/", "\\\\"), "${buildDirectory}");
+        string = replaceWithSlashCombinations(string, buildDirectory2, "${buildDirectory}");
+        string = replaceWithSlashCombinations(string, sourceDirectory, "${sourceDirectory}");
         com.google.common.io.Files.write(string,
                 new File(exampleMessages, String.format("android-studio-%s.json",
                         hash)), Charsets.UTF_8);
