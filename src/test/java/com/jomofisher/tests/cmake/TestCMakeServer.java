@@ -292,6 +292,7 @@ public class TestCMakeServer {
                 "-DCMAKE_TOOLCHAIN_FILE=" + toolChain,
                 "-DANDROID_NATIVE_API_LEVEL=21",
                 "-DANDROID_TOOLCHAIN=gcc",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
                 "-DCMAKE_CXX_FLAGS=");
 
         ComputeResult computeResult = connection.compute();
@@ -313,6 +314,7 @@ public class TestCMakeServer {
                 "-DCMAKE_MAKE_PROGRAM=" + getNinjaInstallFolder().getAbsolutePath() + "/ninja",
                 "-DCMAKE_TOOLCHAIN_FILE=" + toolChain,
                 "-DANDROID_NATIVE_API_LEVEL=21",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
                 "-DANDROID_TOOLCHAIN=gcc",
                 "-DCMAKE_CXX_FLAGS=");
 
@@ -375,6 +377,7 @@ public class TestCMakeServer {
                 String.format("-DCMAKE_TOOLCHAIN_FILE=%s\\prebuilts\\android-ndk-r13b\\build\\cmake\\android.toolchain.cmake",
                         new File(".").getAbsolutePath()),
                 "-DANDROID_NATIVE_API_LEVEL=21",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
                 "-DANDROID_TOOLCHAIN=gcc",
                 "-DCMAKE_CXX_FLAGS=");
 
