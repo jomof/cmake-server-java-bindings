@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jomofisher.cmake.CMake;
+import com.jomofisher.cmake.CMakeVersion;
 import com.jomofisher.cmake.database.Compilation;
 import com.jomofisher.cmake.serverv1.*;
 import com.jomofisher.literatehash.LiterateHash;
@@ -380,6 +381,18 @@ public class TestCMakeServer {
         CMake cmake = new CMake(getAndroidStudioCMakeExecutable().getParentFile());
         String version = cmake.getVersionString();
         assertThat(version).isEqualTo("3.6.0-rc2");
+        CMakeVersion cmakeVersion = cmake.getVersion();
+        assertThat(cmakeVersion.major).isEqualTo(3);
+        assertThat(cmakeVersion.minor).isEqualTo(6);
+        assertThat(cmakeVersion.point).isEqualTo(0);
+        assertThat(cmakeVersion.tag).isEqualTo("rc2");
+    }
+
+    @Test
+    public void testCMakeVersion() throws Exception {
+        CMake cmake = new CMake(getCMakeInstallFolder());
+        CMakeVersion cmakeVersion = cmake.getVersion();
+        assertThat(cmakeVersion.major).isEqualTo(3);
     }
 
     @Test

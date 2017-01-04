@@ -94,4 +94,28 @@ public class CMake {
         }
         return line.substring(CMAKE_VERSION_LINE_PREFIX.length());
     }
+
+    /**
+     * Get the current CMake version as a structure
+     */
+    public CMakeVersion getVersion() throws IOException {
+        String string = getVersionString();
+        String[] parts = string.split("\\.");
+        if (parts[2].contains("-")) {
+            // There is a tag, as in 3.6.0-rc2
+            String[] subparts = parts[2].split("-");
+            return new CMakeVersion(
+                    Integer.parseInt(parts[0]),
+                    Integer.parseInt(parts[1]),
+                    Integer.parseInt(subparts[0]),
+                    subparts[1]);
+        }
+
+        // There's no tag
+        return new CMakeVersion(
+                Integer.parseInt(parts[0]),
+                Integer.parseInt(parts[1]),
+                Integer.parseInt(parts[2]),
+                "");
+    }
 }
