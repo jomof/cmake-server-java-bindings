@@ -374,6 +374,9 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidStudioCMakeVersion() throws Exception {
+        if ("1".equals(System.getenv().get("NO_ANDROID_STUDIO_CMAKE_ON_THIS_OS"))) {
+            return;
+        }
         CMake cmake = new CMake(getAndroidStudioCMakeExecutable().getParentFile());
         String version = cmake.getVersionString();
         assertThat(version).isEqualTo("3.6.1-rc2");

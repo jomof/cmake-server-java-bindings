@@ -26,7 +26,7 @@ matrix:
       - unzip cmake-3.6.3155560-linux-x86_64.zip -d prebuilts/android-studio-cmake-3.6.3155560-linux-x86_64/
       - prebuilts/android-studio-cmake-3.6.3155560-linux-x86_64/bin/cmake --version
     script:
-      - ./gradlew assemble check jacocoTestReport
+      - ./gradlew assemble check jacocoTestReport --info
     after_success:
       - bash <(curl -s https://codecov.io/bash)
   - os: linux
