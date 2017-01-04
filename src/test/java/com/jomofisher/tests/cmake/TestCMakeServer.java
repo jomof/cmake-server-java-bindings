@@ -379,7 +379,7 @@ public class TestCMakeServer {
         }
         CMake cmake = new CMake(getAndroidStudioCMakeExecutable().getParentFile());
         String version = cmake.getVersionString();
-        assertThat(version).isEqualTo("3.6.1-rc2");
+        assertThat(version).isEqualTo("3.6.0-rc2");
     }
 
     @Test
