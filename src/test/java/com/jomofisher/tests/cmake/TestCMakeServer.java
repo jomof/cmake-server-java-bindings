@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jomofisher.cmake.CMake;
+import com.jomofisher.cmake.database.Compilation;
 import com.jomofisher.cmake.serverv1.*;
 import com.jomofisher.literatehash.LiterateHash;
 import com.jomofisher.tests.cmake.model.AndroidGradleBuild;
@@ -124,8 +125,12 @@ public class TestCMakeServer {
         }
     }
 
+    private CMake getCMake() {
+        return new CMake(getCMakeInstallFolder());
+    }
+
     private ServerConnectionBuilder getConnectionBuilder() {
-        return getConnectionBuilder(getCMakeInstallFolder());
+        return getConnectionBuilder(getCMake());
     }
 
     private void setUpCmakeEnvironment(Map<String, String> environment) {
@@ -141,8 +146,7 @@ public class TestCMakeServer {
         }
     }
 
-    private ServerConnectionBuilder getConnectionBuilder(File cmakeInstallFolder) {
-        CMake cmake = new CMake(cmakeInstallFolder);
+    private ServerConnectionBuilder getConnectionBuilder(CMake cmake) {
         setUpCmakeEnvironment(cmake.environment());
 
         return cmake.newServerBuilder()
@@ -246,6 +250,21 @@ public class TestCMakeServer {
     }
 
     @Test
+    public void testCompilationDatabase() throws Exception {
+        CMake cmake = new CMake(getCMakeInstallFolder());
+        ServerConnection connection = getConnectionBuilder(cmake).create();
+        HandshakeRequest handshake = getHelloWorldHandshake();
+        connection.handshake(handshake);
+        connection.configure("-DCMAKE_EXPORT_COMPILE_COMMANDS=1");
+        connection.compute();
+        Compilation[] database = cmake.getCompilationDatabase(new File(handshake.buildDirectory));
+        assertThat(database).hasLength(1);
+        assertThat(database[0].command).isNotNull();
+        assertThat(database[0].directory).isNotNull();
+        assertThat(database[0].file).isNotNull();
+    }
+
+    @Test
     public void testCompute() throws Exception {
         ServerConnection connection = getConnectionBuilder().create();
         HandshakeResult handshakeResult = connection.handshake(getHelloWorldHandshake());
@@ -279,7 +298,7 @@ public class TestCMakeServer {
         if ("1".equals(System.getenv().get("NO_ANDROID_STUDIO_CMAKE_ON_THIS_OS"))) {
             return;
         }
-        ServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
+        ServerConnection connection = getConnectionBuilder(getCMake()).create();
         HelloResult helloResult = connection.getConnectionHelloResult();
 
         HandshakeRequest handshakeRequest = getAndroidSharedLibHandshake();
@@ -355,7 +374,7 @@ public class TestCMakeServer {
 
     @Test
     public void testAndroidCodeModel() throws Exception {
-        ServerConnection connection = getConnectionBuilder(getCMakeInstallFolder()).create();
+        ServerConnection connection = getConnectionBuilder(getCMake()).create();
         HelloResult helloResult = connection.getConnectionHelloResult();
 
         assertThat(helloResult.type).isNotNull();

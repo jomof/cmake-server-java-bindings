@@ -15,9 +15,14 @@
  */
 package com.jomofisher.cmake;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.jomofisher.cmake.database.Compilation;
 import com.jomofisher.cmake.serverv1.ServerConnectionBuilder;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 
 /**
@@ -54,5 +59,20 @@ public class CMake {
      */
     public Map<String, String> environment() {
         return this.cmakeProcessEnvironment;
+    }
+
+    /**
+     * Get the compilation database if one was created. Compilation database is created when server connection is
+     * configured with -DCMAKE_EXPORT_COMPILE_COMMANDS=1. The file is created during compute phase.
+     */
+    public Compilation[] getCompilationDatabase(File buildDirectory) throws IOException {
+        File compileCommandsFile = new File(buildDirectory, "compile_commands.json");
+        if (!compileCommandsFile.isFile()) {
+            throw new RuntimeException(String.format("File %s not found", compileCommandsFile));
+        }
+        String text = new String(Files.readAllBytes(compileCommandsFile.toPath()));
+        Gson gson = new GsonBuilder()
+                .create();
+        return gson.fromJson(text, Compilation[].class);
     }
 }
