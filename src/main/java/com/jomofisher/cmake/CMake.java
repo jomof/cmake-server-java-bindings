@@ -20,8 +20,10 @@ import com.google.gson.GsonBuilder;
 import com.jomofisher.cmake.database.Compilation;
 import com.jomofisher.cmake.serverv1.ServerConnectionBuilder;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Map;
 
@@ -29,6 +31,7 @@ import java.util.Map;
  * CMake functionality bound to a particular CMake install path.
  */
 public class CMake {
+    final private static String CMAKE_VERSION_LINE_PREFIX = "cmake version ";
     final private File cmakeInstallPath;
     final private Map<String, String> cmakeProcessEnvironment;
 
@@ -74,5 +77,21 @@ public class CMake {
         Gson gson = new GsonBuilder()
                 .create();
         return gson.fromJson(text, Compilation[].class);
+    }
+
+    /**
+     * Get the current CMake version as a string like "3.6.0-rc2"
+     */
+    public String getVersionString() throws IOException {
+        File cmakeExecutable = new File(cmakeInstallPath, "cmake");
+        ProcessBuilder processBuilder = new ProcessBuilder(cmakeExecutable.getAbsolutePath(), "--version");
+        processBuilder.redirectErrorStream();
+        Process process = processBuilder.start();
+        BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line = in.readLine();
+        if (!line.startsWith(CMAKE_VERSION_LINE_PREFIX)) {
+            throw new RuntimeException("Did not recognize stdout line as a CMake version: " + line);
+        }
+        return line.substring(CMAKE_VERSION_LINE_PREFIX.length());
     }
 }

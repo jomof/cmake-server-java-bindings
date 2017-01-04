@@ -373,6 +373,13 @@ public class TestCMakeServer {
     }
 
     @Test
+    public void testAndroidStudioCMakeVersion() throws Exception {
+        CMake cmake = new CMake(getAndroidStudioCMakeExecutable().getParentFile());
+        String version = cmake.getVersionString();
+        assertThat(version).isEqualTo("3.6.1-rc2");
+    }
+
+    @Test
     public void testAndroidCodeModel() throws Exception {
         ServerConnection connection = getConnectionBuilder(getCMake()).create();
         HelloResult helloResult = connection.getConnectionHelloResult();
