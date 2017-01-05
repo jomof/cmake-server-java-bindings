@@ -160,7 +160,7 @@ public class ServerConnection {
     public ConfigureResult configure(String... cacheArguments) throws IOException {
         ConfigureRequest message = new ConfigureRequest();
 
-        // Insert a blank element to work around a bug in CMake 3.7.1 where the first element is ignored.
+        // Insert a blank element to work around a bug in Cmake 3.7.1 where the first element is ignored.
         message.cacheArguments = new String[cacheArguments.length + 1];
         message.cacheArguments[0] = "";
         System.arraycopy(cacheArguments, 0, message.cacheArguments, 1, cacheArguments.length);

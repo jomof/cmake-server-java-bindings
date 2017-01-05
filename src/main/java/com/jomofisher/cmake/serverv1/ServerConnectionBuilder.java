@@ -36,7 +36,7 @@ public class ServerConnectionBuilder {
     /**
      * Start the server and return a connection to it.
      *
-     * @return A connection to the CMake server that can be used to interact with.
+     * @return A connection to the Cmake server that can be used to interact with.
      * @throws IOException if there was a problem spawning the process.
      */
     public ServerConnection create() throws IOException {
