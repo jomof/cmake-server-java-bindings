@@ -28,14 +28,14 @@ import java.nio.file.Files;
 import java.util.Map;
 
 /**
- * CMake functionality bound to a particular CMake install path.
+ * Cmake functionality bound to a particular Cmake install path.
  */
-public class CMake {
+public class Cmake {
     final private static String CMAKE_VERSION_LINE_PREFIX = "cmake version ";
     final private File cmakeInstallPath;
     final private Map<String, String> cmakeProcessEnvironment;
 
-    public CMake(File cmakeInstallPath) {
+    public Cmake(File cmakeInstallPath) {
         this.cmakeInstallPath = cmakeInstallPath;
         this.cmakeProcessEnvironment = new ProcessBuilder().environment();
     }
@@ -57,7 +57,7 @@ public class CMake {
     }
 
     /**
-     * Get the environment that CMake will be (or already was) started with. If the process hasn't been started yet
+     * Get the environment that Cmake will be (or already was) started with. If the process hasn't been started yet
      * the changes here will end up in the environment of the spawned process.
      */
     public Map<String, String> environment() {
@@ -80,7 +80,7 @@ public class CMake {
     }
 
     /**
-     * Get the current CMake version as a string like "3.6.0-rc2"
+     * Get the current Cmake version as a string like "3.6.0-rc2"
      */
     public String getVersionString() throws IOException {
         File cmakeExecutable = new File(cmakeInstallPath, "cmake");
@@ -90,21 +90,22 @@ public class CMake {
         BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line = in.readLine();
         if (!line.startsWith(CMAKE_VERSION_LINE_PREFIX)) {
-            throw new RuntimeException("Did not recognize stdout line as a CMake version: " + line);
+            throw new RuntimeException("Did not recognize stdout line as a Cmake version: " + line);
         }
         return line.substring(CMAKE_VERSION_LINE_PREFIX.length());
     }
 
     /**
-     * Get the current CMake version as a structure
+     * Get the current Cmake version as a structure
      */
-    public CMakeVersion getVersion() throws IOException {
+    public CmakeVersion getVersion() throws IOException {
         String string = getVersionString();
         String[] parts = string.split("\\.");
         if (parts[2].contains("-")) {
             // There is a tag, as in 3.6.0-rc2
             String[] subparts = parts[2].split("-");
-            return new CMakeVersion(
+            return new CmakeVersion(
+                    string,
                     Integer.parseInt(parts[0]),
                     Integer.parseInt(parts[1]),
                     Integer.parseInt(subparts[0]),
@@ -112,7 +113,8 @@ public class CMake {
         }
 
         // There's no tag
-        return new CMakeVersion(
+        return new CmakeVersion(
+                string,
                 Integer.parseInt(parts[0]),
                 Integer.parseInt(parts[1]),
                 Integer.parseInt(parts[2]),
