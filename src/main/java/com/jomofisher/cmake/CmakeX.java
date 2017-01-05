@@ -30,12 +30,12 @@ import java.util.Map;
 /**
  * Cmake functionality bound to a particular Cmake install path.
  */
-public class Cmake {
+public class CmakeX {
     final private static String CMAKE_VERSION_LINE_PREFIX = "cmake version ";
     final private File cmakeInstallPath;
     final private Map<String, String> cmakeProcessEnvironment;
 
-    public Cmake(File cmakeInstallPath) {
+    public CmakeX(File cmakeInstallPath) {
         this.cmakeInstallPath = cmakeInstallPath;
         this.cmakeProcessEnvironment = new ProcessBuilder().environment();
     }
@@ -98,13 +98,13 @@ public class Cmake {
     /**
      * Get the current Cmake version as a structure
      */
-    public CmakeVersion getVersion() throws IOException {
+    public CmakeVersionX getVersion() throws IOException {
         String string = getVersionString();
         String[] parts = string.split("\\.");
         if (parts[2].contains("-")) {
             // There is a tag, as in 3.6.0-rc2
             String[] subparts = parts[2].split("-");
-            return new CmakeVersion(
+            return new CmakeVersionX(
                     string,
                     Integer.parseInt(parts[0]),
                     Integer.parseInt(parts[1]),
@@ -113,7 +113,7 @@ public class Cmake {
         }
 
         // There's no tag
-        return new CmakeVersion(
+        return new CmakeVersionX(
                 string,
                 Integer.parseInt(parts[0]),
                 Integer.parseInt(parts[1]),

@@ -18,8 +18,8 @@ package com.jomofisher.tests.cmake;
 import com.google.common.base.Charsets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.jomofisher.cmake.Cmake;
-import com.jomofisher.cmake.CmakeVersion;
+import com.jomofisher.cmake.CmakeVersionX;
+import com.jomofisher.cmake.CmakeX;
 import com.jomofisher.cmake.database.Compilation;
 import com.jomofisher.cmake.serverv1.*;
 import com.jomofisher.literatehash.LiterateHash;
@@ -59,7 +59,6 @@ public class TestCMakeServer {
             }
         }
     }
-
 
     private File getTemporaryBuildOutputFolder() throws IOException {
         Path basedir = FileSystems.getDefault().getPath("test-output").toAbsolutePath();
@@ -126,8 +125,8 @@ public class TestCMakeServer {
         }
     }
 
-    private Cmake getCMake() {
-        return new Cmake(getCMakeInstallFolder());
+    private CmakeX getCMake() {
+        return new CmakeX(getCMakeInstallFolder());
     }
 
     private ServerConnectionBuilder getConnectionBuilder() {
@@ -147,7 +146,7 @@ public class TestCMakeServer {
         }
     }
 
-    private ServerConnectionBuilder getConnectionBuilder(Cmake cmake) {
+    private ServerConnectionBuilder getConnectionBuilder(CmakeX cmake) {
         setUpCmakeEnvironment(cmake.environment());
 
         return cmake.newServerBuilder()
@@ -252,7 +251,7 @@ public class TestCMakeServer {
 
     @Test
     public void testCompilationDatabase() throws Exception {
-        Cmake cmake = new Cmake(getCMakeInstallFolder());
+        CmakeX cmake = new CmakeX(getCMakeInstallFolder());
         ServerConnection connection = getConnectionBuilder(cmake).create();
         HandshakeRequest handshake = getHelloWorldHandshake();
         connection.handshake(handshake);
@@ -378,10 +377,10 @@ public class TestCMakeServer {
         if ("1".equals(System.getenv().get("NO_ANDROID_STUDIO_CMAKE_ON_THIS_OS"))) {
             return;
         }
-        Cmake cmake = new Cmake(getAndroidStudioCMakeExecutable().getParentFile());
+        CmakeX cmake = new CmakeX(getAndroidStudioCMakeExecutable().getParentFile());
         String version = cmake.getVersionString();
         assertThat(version).isEqualTo("3.6.0-rc2");
-        CmakeVersion cmakeVersion = cmake.getVersion();
+        CmakeVersionX cmakeVersion = cmake.getVersion();
         assertThat(cmakeVersion.full).isEqualTo("3.6.0-rc2");
         assertThat(cmakeVersion.major).isEqualTo(3);
         assertThat(cmakeVersion.minor).isEqualTo(6);
@@ -391,8 +390,8 @@ public class TestCMakeServer {
 
     @Test
     public void testCMakeVersion() throws Exception {
-        Cmake cmake = new Cmake(getCMakeInstallFolder());
-        CmakeVersion cmakeVersion = cmake.getVersion();
+        CmakeX cmake = new CmakeX(getCMakeInstallFolder());
+        CmakeVersionX cmakeVersion = cmake.getVersion();
         assertThat(cmakeVersion.major).isEqualTo(3);
     }
 
@@ -574,7 +573,7 @@ public class TestCMakeServer {
         //noinspection ConstantConditions
         if (false) { // Just make sure it compiles
             // Usage example
-            ServerConnection connection = new Cmake(getCMakeInstallFolder())
+            ServerConnection connection = new CmakeX(getCMakeInstallFolder())
                     .newServerBuilder()
                     .create();
             HandshakeRequest message = new HandshakeRequest();
